@@ -65,6 +65,54 @@ It does not suggest code. It **executes** code, observes test results, iterates 
 
 ## Architecture
 
+### System Overview
+
+```
+GitHub Issue
+     ↓
+Issue Analyzer
+     ↓
+Repository Retriever
+     ↓
+Planner
+     ↓
+Code Editor
+     ↓
+Sandbox Executor
+     ↓
+Test Result Analyzer
+     ↓
+ ┌───────────────┐
+ │ Tests Failed? │
+ └───────┬───────┘
+         │ Yes
+         ↓
+   Error Investigator
+         ↓
+      Tavily
+         ↓
+    Fix Generator
+         │
+         └──────────────→ Sandbox Executor
+                                ↓
+                         Test Result Analyzer
+                                ↓
+                          ┌─────┴─────┐
+                          │  Passed?  │
+                          └─────┬─────┘
+                                │ Yes
+                                ↓
+         │ No (from first run)
+         ↓
+    Patch Reviewer
+         ↓
+    PR Generator
+         ↓
+      GitHub PR ✅
+```
+
+### Service Architecture
+
 ```
 ┌────────────────────────────────────────────────────────────────────┐
 │                          GitHub App                                │
@@ -86,13 +134,13 @@ It does not suggest code. It **executes** code, observes test results, iterates 
            │                             └─────────────────────────────┘
            ▼
 ┌──────────────────────────────────────────────────────────────────────┐
-│                    LangGraph State Machine                           │
+│                    LangGraph State Machine (12 nodes)               │
 │                                                                      │
 │  issue_analysis → repo_analysis → code_retrieval → planning         │
 │       → implementation → test_generation → sandbox_execution        │
 │           ↓ fail                  ↓ pass                            │
-│  failure_analysis → web_research → patch_revision                   │
-│  (loop max 3x)                                                       │
+│  failure_analysis → web_research → patch_revision ──→ sandbox       │
+│  (loop max 3×)                                                       │
 │           ↓ pass                                                     │
 │       verification → pr_generation                                   │
 └──────┬────────────────────┬───────────────────┬───────────────────┬─┘
@@ -106,7 +154,7 @@ It does not suggest code. It **executes** code, observes test results, iterates 
                                                           (selective, audited)
 ```
 
-### Agent State Machine
+### LangGraph Node Flow
 
 ```
 [issue_analysis]
