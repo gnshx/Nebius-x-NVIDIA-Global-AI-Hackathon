@@ -118,6 +118,10 @@ type-check: ## Run mypy (backend) and tsc (frontend)
 # ---------------------------------------------------------------------------
 # Demo
 # ---------------------------------------------------------------------------
+demo-live: ## Run live 12-node autonomous agent demo in terminal
+	@echo "→ Executing RepoMedic Live Agent..."
+	python3 scripts/run_live_demo.py
+
 demo: ## Seed demo repo and start a demo agent run
 	@echo "→ Starting demo..."
 	docker compose up -d
