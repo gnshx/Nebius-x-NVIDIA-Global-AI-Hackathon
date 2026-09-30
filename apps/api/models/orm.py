@@ -13,7 +13,10 @@ from datetime import datetime
 from enum import Enum as PyEnum
 from typing import Any
 
-from pgvector.sqlalchemy import Vector
+try:
+    from pgvector.sqlalchemy import Vector
+except ImportError:
+    from sqlalchemy import JSON as Vector  # type: ignore
 from sqlalchemy import (
     Boolean,
     DateTime,
@@ -33,46 +36,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from db.database import Base
 
 
-# ---------------------------------------------------------------------------
-# Enums
-# ---------------------------------------------------------------------------
-class RunStatus(str, PyEnum):
-    PENDING = "PENDING"
-    RUNNING = "RUNNING"
-    SUCCESS = "SUCCESS"
-    FAILED = "FAILED"
-    CANCELLED = "CANCELLED"
-    TIMED_OUT = "TIMED_OUT"
-
-
-class StepStatus(str, PyEnum):
-    PENDING = "PENDING"
-    RUNNING = "RUNNING"
-    SUCCESS = "SUCCESS"
-    FAILED = "FAILED"
-    SKIPPED = "SKIPPED"
-
-
-class StepType(str, PyEnum):
-    ISSUE_ANALYSIS = "issue_analysis"
-    REPOSITORY_ANALYSIS = "repository_analysis"
-    CODE_RETRIEVAL = "code_retrieval"
-    PLANNING = "planning"
-    IMPLEMENTATION = "implementation"
-    TEST_GENERATION = "test_generation"
-    SANDBOX_EXECUTION = "sandbox_execution"
-    FAILURE_ANALYSIS = "failure_analysis"
-    WEB_RESEARCH = "web_research"
-    PATCH_REVISION = "patch_revision"
-    VERIFICATION = "verification"
-    PR_GENERATION = "pr_generation"
-
-
-class RepositoryStatus(str, PyEnum):
-    PENDING = "PENDING"
-    INDEXING = "INDEXING"
-    INDEXED = "INDEXED"
-    ERROR = "ERROR"
+from models.enums import RepositoryStatus, RunStatus, StepStatus, StepType
 
 
 # ---------------------------------------------------------------------------

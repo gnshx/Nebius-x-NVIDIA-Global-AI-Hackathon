@@ -15,39 +15,7 @@ from typing import Any
 from pydantic import BaseModel, Field, HttpUrl
 
 
-# ---------------------------------------------------------------------------
-# Enums (mirrored from ORM for serialization)
-# ---------------------------------------------------------------------------
-class RunStatus(str, Enum):
-    PENDING = "PENDING"
-    RUNNING = "RUNNING"
-    SUCCESS = "SUCCESS"
-    FAILED = "FAILED"
-    CANCELLED = "CANCELLED"
-    TIMED_OUT = "TIMED_OUT"
-
-
-class StepStatus(str, Enum):
-    PENDING = "PENDING"
-    RUNNING = "RUNNING"
-    SUCCESS = "SUCCESS"
-    FAILED = "FAILED"
-    SKIPPED = "SKIPPED"
-
-
-class StepType(str, Enum):
-    ISSUE_ANALYSIS = "issue_analysis"
-    REPOSITORY_ANALYSIS = "repository_analysis"
-    CODE_RETRIEVAL = "code_retrieval"
-    PLANNING = "planning"
-    IMPLEMENTATION = "implementation"
-    TEST_GENERATION = "test_generation"
-    SANDBOX_EXECUTION = "sandbox_execution"
-    FAILURE_ANALYSIS = "failure_analysis"
-    WEB_RESEARCH = "web_research"
-    PATCH_REVISION = "patch_revision"
-    VERIFICATION = "verification"
-    PR_GENERATION = "pr_generation"
+from models.enums import RepositoryStatus, RunStatus, StepStatus, StepType
 
 
 # ---------------------------------------------------------------------------

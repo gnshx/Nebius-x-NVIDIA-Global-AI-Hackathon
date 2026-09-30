@@ -20,7 +20,7 @@ import structlog
 
 from agents.nodes.base import node_context
 from agents.state import RepoMedicState
-from models.orm import StepType
+from models.enums import StepType
 from models.schemas import PatchReview
 from services.nebius.client import Message, model_provider
 

@@ -20,7 +20,8 @@ import structlog
 from agents.nodes.base import node_context
 from agents.state import RepoMedicState
 from db.database import AsyncSessionLocal
-from models.orm import ResearchQuery, StepType
+from models.orm import ResearchQuery
+from models.enums import StepType
 from services.tavily.client import tavily_client
 
 logger = structlog.get_logger(__name__)

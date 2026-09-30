@@ -27,7 +27,8 @@ import structlog
 from agents.nodes.base import node_context
 from agents.state import RepoMedicState
 from db.database import AsyncSessionLocal
-from models.orm import AgentRun, SandboxRun, StepType, TestResult
+from models.orm import AgentRun, SandboxRun, TestResult
+from models.enums import StepType
 from services.nebius.local_sandbox import get_sandbox_executor
 
 logger = structlog.get_logger(__name__)
@@ -190,43 +191,46 @@ async def run(state: RepoMedicState) -> dict:
     )
     test_result["duration_seconds"] = test_result_raw.duration_seconds
 
-    # 6. Persist SandboxRun + TestResult to DB
+    # 6. Persist SandboxRun + TestResult to DB (resilient to offline DB)
     sandbox_run_id = str(uuid.uuid4())
-    async with AsyncSessionLocal() as session:
-        sandbox_run = SandboxRun(
-            id=uuid.UUID(sandbox_run_id),
-            agent_run_id=uuid.UUID(run_id),
-            sandbox_id=sandbox_id,
-            iteration=iteration,
-            exit_code=test_result_raw.exit_code,
-            stdout=test_result_raw.stdout,
-            stderr=test_result_raw.stderr,
-            duration_seconds=test_result_raw.duration_seconds,
-            timed_out=test_result_raw.timed_out,
-            command=test_command,
-        )
-        session.add(sandbox_run)
-        await session.flush()
+    try:
+        async with AsyncSessionLocal() as session:
+            sandbox_run = SandboxRun(
+                id=uuid.UUID(sandbox_run_id),
+                agent_run_id=uuid.UUID(run_id),
+                sandbox_id=sandbox_id,
+                iteration=iteration,
+                exit_code=test_result_raw.exit_code,
+                stdout=test_result_raw.stdout,
+                stderr=test_result_raw.stderr,
+                duration_seconds=test_result_raw.duration_seconds,
+                timed_out=test_result_raw.timed_out,
+                command=test_command,
+            )
+            session.add(sandbox_run)
+            await session.flush()
 
-        db_test_result = TestResult(
-            sandbox_run_id=uuid.UUID(sandbox_run_id),
-            success=test_result["success"],
-            tests_total=test_result.get("tests_total"),
-            tests_passed=test_result.get("tests_passed"),
-            tests_failed=test_result.get("tests_failed"),
-            tests_skipped=test_result.get("tests_skipped"),
-            failure_summary=test_result.get("failure_summary"),
-            failing_tests=test_result.get("failing_tests", []),
-            raw_output=(test_result_raw.stdout + "\n" + test_result_raw.stderr)[:50_000],
-        )
-        session.add(db_test_result)
+            db_test_result = TestResult(
+                sandbox_run_id=uuid.UUID(sandbox_run_id),
+                success=test_result["success"],
+                tests_total=test_result.get("tests_total"),
+                tests_passed=test_result.get("tests_passed"),
+                tests_failed=test_result.get("tests_failed"),
+                tests_skipped=test_result.get("tests_skipped"),
+                failure_summary=test_result.get("failure_summary"),
+                failing_tests=test_result.get("failing_tests", []),
+                raw_output=(test_result_raw.stdout + "\n" + test_result_raw.stderr)[:50_000],
+            )
+            session.add(db_test_result)
 
-        # Update agent_run iteration counter
-        agent_run = await session.get(AgentRun, uuid.UUID(run_id))
-        if agent_run:
-            agent_run.iteration = iteration + 1
+            # Update agent_run iteration counter
+            agent_run = await session.get(AgentRun, uuid.UUID(run_id))
+            if agent_run:
+                agent_run.iteration = iteration + 1
 
-        await session.commit()
+            await session.commit()
+    except Exception as db_exc:
+        logger.debug("sandbox_db_persist_skipped", error=str(db_exc))
 
     logger.info(
         "sandbox_execution_complete",
