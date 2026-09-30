@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/gnshx/Nebius-x-NVIDIA-Global-AI-Hackathon/main/assets/logo.png" alt="RepoMedic" width="120" />
+<img src="assets/logo.jpg" alt="RepoMedic Logo" width="160" style="border-radius: 24px; box-shadow: 0 8px 32px rgba(0,255,200,0.15);" />
 
 # 🩺 RepoMedic
 
@@ -64,6 +64,10 @@ It does not suggest code. It **executes** code, observes test results, iterates 
 ---
 
 ## Architecture
+
+<div align="center">
+  <img src="assets/architecture.jpg" alt="RepoMedic System Architecture Infographic" width="100%" style="border-radius: 12px; margin-bottom: 20px;" />
+</div>
 
 ### System Overview
 
@@ -327,6 +331,20 @@ make dev
 | API + Swagger docs | http://localhost:8000/docs |
 | Dashboard | http://localhost:3000 |
 | Celery monitor | http://localhost:5555 |
+
+---
+
+## Real-Time Dashboard
+
+<div align="center">
+  <img src="assets/dashboard.jpg" alt="RepoMedic Live Developer Dashboard" width="100%" style="border-radius: 12px; margin-bottom: 20px;" />
+</div>
+
+The Next.js 14 dashboard provides live observability into the autonomous agent loop:
+- **Real-Time Timeline:** Streams state machine transitions via Server-Sent Events (SSE)
+- **Pytest Output Badges:** Visual test result counters with pass/fail breakdowns
+- **Unified Diff Viewer:** Inspects proposed patches and regression tests before PR opening
+- **Audit Logs:** Full visibility into model slots, token consumption, and execution durations
 
 ---
 

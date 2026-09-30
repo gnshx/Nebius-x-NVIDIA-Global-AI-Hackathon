@@ -44,21 +44,24 @@ export default async function HomePage() {
   return (
     <div className="space-y-10">
       {/* Hero */}
-      <section className="text-center space-y-3 py-8">
-        <h1 className="text-5xl font-extrabold tracking-tight">🩺 RepoMedic</h1>
+      <section className="text-center space-y-4 py-8">
+        <div className="flex justify-center">
+          <img src="/assets/logo.jpg" alt="RepoMedic Logo" className="w-20 h-20 rounded-2xl shadow-lg border border-border" />
+        </div>
+        <h1 className="text-5xl font-extrabold tracking-tight">RepoMedic</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Autonomous GitHub Issue-to-PR Agent
+          Autonomous GitHub Issue-to-PR Verification Agent
         </p>
         <p className="text-sm text-muted-foreground max-w-xl mx-auto">
-          RepoMedic automatically diagnoses GitHub issues, writes fixes, runs tests in a sandbox,
-          and opens pull requests — all without human intervention.
+          Powered by NVIDIA Nemotron on Nebius Token Factory. Diagnoses bugs, writes patches,
+          executes tests in an isolated sandbox, and opens verified pull requests.
         </p>
         <div className="pt-2">
           <Link
             href="/runs"
-            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm"
+            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm shadow-md"
           >
-            View All Runs <ArrowRight className="h-4 w-4" />
+            View Active Runs <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>
@@ -160,6 +163,25 @@ export default async function HomePage() {
             </table>
           </div>
         )}
+      </section>
+
+      {/* Architecture Showcase */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold tracking-tight">System Architecture</h2>
+            <p className="text-sm text-muted-foreground">
+              Autonomous execution-and-verification state machine powered by NVIDIA Nemotron & Nebius Token Factory
+            </p>
+          </div>
+        </div>
+        <div className="rounded-2xl border bg-card p-2 overflow-hidden shadow-sm">
+          <img
+            src="/assets/architecture.jpg"
+            alt="RepoMedic System Architecture Diagram"
+            className="w-full rounded-xl object-cover"
+          />
+        </div>
       </section>
     </div>
   );
