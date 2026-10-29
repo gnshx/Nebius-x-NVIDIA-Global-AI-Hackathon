@@ -80,7 +80,16 @@ async def run(state: RepoMedicState) -> dict:
         )
     ]
 
-    logger.info("planning_start", run_id=run_id, iteration=iteration)
+    from services.compute_budget import ComplexityAnalyzer
+
+    budget = ComplexityAnalyzer.allocate_budget(
+        issue_title=issue.get("title", ""),
+        issue_body=issue.get("body", ""),
+        acceptance_criteria=issue_analysis.get("acceptance_criteria"),
+        context_chunks_count=len(retrieved_context),
+    )
+
+    logger.info("planning_start", run_id=run_id, iteration=iteration, budget_tier=budget.tier.value)
 
     async with node_context(
         run_id,
@@ -90,10 +99,14 @@ async def run(state: RepoMedicState) -> dict:
         {
             "issue_number": issue.get("number"),
             "context_chunks": len(retrieved_context),
+            "compute_budget": budget.to_dict(),
         },
     ):
         plan: ImplementationPlan = await model_provider.planner.generate_structured(
-            messages, ImplementationPlan
+            messages,
+            ImplementationPlan,
+            temperature=budget.temperature,
+            max_tokens=budget.max_tokens,
         )
 
     logger.info(
@@ -102,6 +115,10 @@ async def run(state: RepoMedicState) -> dict:
         root_cause=plan.root_cause_hypothesis[:120],
         files_to_modify=plan.files_to_modify,
         test_command=plan.test_command,
+        budget_tier=budget.tier.value,
     )
 
-    return {"plan": plan.model_dump()}
+    return {
+        "plan": plan.model_dump(),
+        "compute_budget": budget.to_dict(),
+    }
