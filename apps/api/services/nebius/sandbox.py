@@ -1,7 +1,7 @@
 """
-RepoMedic — Nebius Sandbox Executor
+RepoMedic — Remote Sandbox API Executor Adapter
 
-Provides a remote code-execution sandbox via the Nebius Sandbox API.
+Provides an optional remote code-execution sandbox adapter via REST API.
 All interactions are async; stdout/stderr are truncated to a safe byte limit.
 """
 from __future__ import annotations
@@ -37,7 +37,7 @@ def _truncate(text: str, max_bytes: int) -> str:
 
 
 class SandboxExecutor:
-    """Async client for the Nebius Sandbox REST API."""
+    """Async client for the optional remote Sandbox REST API."""
 
     def __init__(self) -> None:
         self._base_url = str(settings.nebius_sandbox_url).rstrip("/")

@@ -33,7 +33,7 @@ It does not suggest code. It **executes** code, observes test results, iterates 
 ```
 /repomedic fix  ──→  [Nemotron reasons]  ──→  [Code modified]
                                                       │
-                                              [Nebius Sandbox]
+                                             [Isolated Sandbox]
                                                       │
                                             ┌─────────┴─────────┐
                                        Tests pass?           Tests fail?
@@ -42,7 +42,7 @@ It does not suggest code. It **executes** code, observes test results, iterates 
                                                                  │
                                                         [Patch Revised]
                                                                  │
-                                                        [Nebius Sandbox]
+                                                        [Isolated Sandbox]
                                                                  │
                                                           Tests pass?
                                                                  │
@@ -150,8 +150,8 @@ Test Result Analyzer
 └──────┬────────────────────┬───────────────────┬───────────────────┬─┘
        │                    │                   │                   │
        ▼                    ▼                   ▼                   ▼
- Nebius LLM API       Nebius Sandbox      PostgreSQL           GitHub REST
- (Nemotron)           (code execution)    + pgvector           API v4
+ NVIDIA NIM API       Isolated Sandbox    PostgreSQL           GitHub REST
+ (Nemotron 30B MoE)   (Docker container)  + pgvector           API v4
                                           + Redis
                                                                     │
                                                              Tavily Search
@@ -173,7 +173,7 @@ Test Result Analyzer
       │
 [test_generation]
       │
-[sandbox_execution] ─── Nebius Sandbox
+[sandbox_execution] ─── Isolated Sandbox (Docker)
       │
       ├── PASS ──→ [verification] ──→ [pr_generation] ──→ GitHub PR ✅
       │
@@ -334,7 +334,7 @@ Every search is persisted with `query`, `reason`, `selected_sources`, and `times
 |---|---|
 | Malicious patches | `PatchValidator`: blocks `../`, `/` absolute paths, `.git/`, `.pem/.key/.env` |
 | Credential exposure | Secret redaction before writing to `agent_steps.output_metadata` |
-| Code execution on host | Never. All execution in Nebius Sandbox only |
+| Code execution on host | Never. All execution in isolated Docker sandbox only |
 | Infinite agent loops | Hard cap: `MAX_FIX_ITERATIONS=3`, enforced at graph router |
 | Webhook spoofing | HMAC-SHA256 signature verified before any event processing |
 | Duplicate PRs | Idempotency: rejects if PENDING/RUNNING run exists for same issue |
@@ -347,7 +347,7 @@ Every search is persisted with `query`, `reason`, `selected_sources`, and `times
 ### Prerequisites
 - Docker + Docker Compose
 - GitHub App credentials
-- Nebius API key
+- NVIDIA NIM API key
 - Tavily API key
 
 ### Setup
@@ -539,7 +539,7 @@ repomedic/
 │   │   │       ├── verification.py
 │   │   │       └── pr_generation.py
 │   │   ├── services/
-│   │   │   ├── nebius/           # LLM client + sandbox executor
+│   │   │   ├── nebius/           # LLM client (NVIDIA NIM) + sandbox executor
 │   │   │   ├── github/           # App auth + REST client + webhook
 │   │   │   ├── tavily/           # Selective web research
 │   │   │   └── test_parser.py    # pytest JSON + text output parsing
@@ -582,10 +582,10 @@ GITHUB_APP_ID=
 GITHUB_PRIVATE_KEY=                  # PEM key (or base64-encoded)
 GITHUB_WEBHOOK_SECRET=
 
-# Nebius Token Factory
-NEBIUS_API_KEY=
-NEBIUS_BASE_URL=https://api.studio.nebius.ai/v1
-NEBIUS_SANDBOX_URL=                  # Token Factory sandbox endpoint
+# NVIDIA NIM API & Model Inference
+NEBIUS_API_KEY=                      # NVIDIA NIM API key (nvapi-...) or Nebius key
+NEBIUS_BASE_URL=https://integrate.api.nvidia.com/v1
+NEBIUS_SANDBOX_URL=                  # Optional remote sandbox URL (defaults to isolated Docker sandbox)
 NEBIUS_EMBEDDING_MODEL=BAAI/bge-en-icl
 
 # NVIDIA Nemotron — 30B MoE Model (NVIDIA NIM API)
@@ -654,7 +654,7 @@ make clean        # Remove containers and volumes
 ## Limitations
 
 - **Python only**: Current MVP supports Python repositories with pytest. Other languages require adding language-specific sandbox commands.
-- **Credentials**: Nebius Sandbox URL must be provided. Development mode falls back to Docker-based local execution.
+- **Execution Sandbox**: Runs natively inside isolated Docker / containerized sandbox with strict pytest test isolation, memory caps, and timeout guards.
 - **Context window**: Very large repositories (>1M tokens) require tuning `MAX_CONTEXT_TOKENS`.
 
 ---

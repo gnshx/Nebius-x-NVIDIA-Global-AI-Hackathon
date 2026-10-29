@@ -90,10 +90,10 @@ class Settings(BaseSettings):
         return ""
 
     # -------------------------------------------------------------------------
-    # Nebius Token Factory — LLM
+    # LLM Inference (NVIDIA NIM API / OpenAI-compatible)
     # -------------------------------------------------------------------------
     nebius_api_key: SecretStr = Field(default="")
-    nebius_base_url: str = "https://api.studio.nebius.ai/v1"
+    nebius_base_url: str = "https://integrate.api.nvidia.com/v1"
     nebius_embedding_model: str = "BAAI/bge-en-icl"
 
     # Model slots — configurable, never hard-coded in agent nodes
@@ -102,7 +102,7 @@ class Settings(BaseSettings):
     nemotron_fast_model: str = "nvidia/nemotron-3.5-lightning-30b-a3b"
 
     # -------------------------------------------------------------------------
-    # Nebius Token Factory — Sandbox
+    # Execution Sandbox (Isolated Docker / Container Sandbox)
     # -------------------------------------------------------------------------
     nebius_sandbox_url: str = ""
     nebius_sandbox_api_key: SecretStr = Field(default="")

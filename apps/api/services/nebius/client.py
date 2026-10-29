@@ -1,5 +1,5 @@
 """
-RepoMedic — Nebius Token Factory Model Client
+RepoMedic — Model Client (NVIDIA NIM API & OpenAI-compatible)
 
 Provides ModelClient (OpenAI-compatible) and ModelProvider
 with three configurable model slots: planner, coder, fast.
@@ -87,7 +87,7 @@ def _extract_json_substring(text: str) -> str:
 
 
 class ModelClient:
-    """Async client for Nebius Token Factory / NVIDIA Nemotron inference."""
+    """Async client for NVIDIA NIM API / NVIDIA Nemotron inference."""
 
     def __init__(self, model: str) -> None:
         self.model = model

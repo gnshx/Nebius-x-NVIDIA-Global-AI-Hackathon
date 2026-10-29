@@ -4,7 +4,7 @@ RepoMedic — Submission Demo Video Generator
 
 Compiles a high-definition 1080p MP4 presentation video using ffmpeg,
 synchronizing visual slides, system architecture diagrams, and the
-ElevenLabs audio narration track.
+neural audio narration track.
 
 Usage:
     python3 scripts/generate_demo_video.py
@@ -39,7 +39,7 @@ def main():
         print(f"🎵 Found audio track: {audio_track}")
     else:
         print("ℹ️ Audio track not found. Video will be generated with visual transitions.")
-        print("   Run `python3 scripts/generate_audio_elevenlabs.py --api-key YOUR_KEY` first to add audio.")
+        print("   Run `python3 scripts/generate_audio_local.py` first to add audio.")
 
     # Slides timing and images
     # We will build a video loop showing:

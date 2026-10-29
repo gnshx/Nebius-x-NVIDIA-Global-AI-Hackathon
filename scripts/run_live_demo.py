@@ -11,7 +11,7 @@ demo repository bug (parse_user_id) and displays a rich terminal timeline:
 4. Implementation Planning
 5. Patch Generation & Security Validation (Nemotron Coder)
 6. Regression Test Generation
-7. Nebius Sandbox Execution (Observes failing tests)
+7. Isolated Sandbox Execution (Observes failing tests)
 8. Failure Analysis (Classifies error)
 9. Selective Tavily Web Research
 10. Patch Revision & Re-execution (Observes 16/16 tests PASS)

@@ -55,7 +55,7 @@ def print_banner():
     print(f"\n{BOLD}{CYAN}╔══════════════════════════════════════════════════════════════════════╗{RESET}")
     print(f"{BOLD}{CYAN}║     🩺 REPOMEDIC — OPEN-SOURCE VERIFICATION PROOF                     ║{RESET}")
     print(f"{BOLD}{CYAN}║     Target: python-humanize/humanize Issue #466                      ║{RESET}")
-    print(f"{BOLD}{CYAN}║     Powered by NVIDIA Nemotron 3.5 Lightning (30B MoE) on Nebius     ║{RESET}")
+    print(f"{BOLD}{CYAN}║     Powered by NVIDIA Nemotron 3.5 Lightning (30B MoE) via NVIDIA NIM║{RESET}")
     print(f"{BOLD}{CYAN}╚══════════════════════════════════════════════════════════════════════╝{RESET}\n")
 
 
