@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { Activity, GitPullRequest, LayoutDashboard, Settings, Database } from 'lucide-react';
 
+import { RepoMedicLogo } from './RepoMedicLogo';
+
 const navLinks = [
   { href: '/', label: 'Overview', icon: LayoutDashboard },
   { href: '/runs', label: 'Runs', icon: Activity },
@@ -15,7 +17,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 font-bold text-lg hover:opacity-80 transition-opacity">
-            <img src="/assets/logo.jpg" alt="RepoMedic Logo" className="w-7 h-7 rounded-lg object-cover shadow-sm" />
+            <RepoMedicLogo size="sm" />
             <span>RepoMedic</span>
           </Link>
 

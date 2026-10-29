@@ -58,8 +58,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 app = FastAPI(
     title="RepoMedic API",
     description=(
-        "Autonomous GitHub Issue-to-PR Agent powered by NVIDIA Nemotron "
-        "on Nebius Token Factory"
+        "Autonomous GitHub Issue-to-PR Agent powered by NVIDIA Nemotron 3.5 Lightning "
+        "via NVIDIA NIM API"
     ),
     version="0.1.0",
     docs_url="/docs",

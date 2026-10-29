@@ -99,7 +99,7 @@ const AGENT_NODES: AgentNodeDef[] = [
     description: 'NVIDIA Nemotron 3.5 Lightning (30B A3B) executes chain-of-thought to formulate repair plan.',
     telemetry: {
       latency: '1.42s',
-      model: 'nvidia/nemotron-3.5-lightning-30b-a3b (Nebius)',
+      model: 'nvidia/nemotron-3.5-lightning-30b-a3b (NVIDIA NIM)',
       status: 'REASONING_COMPLETE',
       details: 'Activating 3.5B params per token; produced structured JSON plan with input validation.',
     },
@@ -155,7 +155,7 @@ const AGENT_NODES: AgentNodeDef[] = [
     description: 'Runs pytest in an isolated environment against full regression suite. 100% pass required.',
     telemetry: {
       latency: '2.10s',
-      model: 'Nebius / Local Isolated Container',
+      model: 'Docker Isolated Sandbox Container',
       status: '241/241 PASSED',
       details: '241 passed in 0.20s; 0 failures, 0 regressions across entire library.',
     },

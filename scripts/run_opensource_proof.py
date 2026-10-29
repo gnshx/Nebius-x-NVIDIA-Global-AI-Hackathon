@@ -8,7 +8,7 @@ open-source repository issue:
 Target Repository: python-humanize/humanize (GitHub, 2.5k+ stars)
 Target Issue:      #466 'intcomma(num, ndigits=-1) ValueError: Format specifier missing precision'
 Affected File:     src/humanize/number.py (intcomma function)
-Model:             NVIDIA Nemotron 3.5 Lightning (30B A3B MoE) via Nebius Token Factory
+Model:             NVIDIA Nemotron 3.5 Lightning (30B A3B MoE) via NVIDIA NIM API
 
 Workflow Demonstrated:
 1. Issue Ingestion & Diagnosis (Nemotron Planner)

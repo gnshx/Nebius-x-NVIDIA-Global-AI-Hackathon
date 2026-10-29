@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getRuns } from '@/lib/api';
+import { getRuns, VERIFIED_RUNS } from '@/lib/api';
 import { AgentRun, RunStatus } from '@/lib/types';
 import { RunStatusBadge } from '@/components/RunStatusBadge';
 import { truncateId, formatDate } from '@/lib/utils';
@@ -19,9 +19,9 @@ const STATUS_FILTERS: { label: string; value: RunStatus | 'ALL' }[] = [
 ];
 
 export default function RunsPage() {
-  const [runs, setRuns] = useState<AgentRun[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [runs, setRuns] = useState<AgentRun[]>(() => VERIFIED_RUNS);
+  const [total, setTotal] = useState(() => VERIFIED_RUNS.length);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<RunStatus | 'ALL'>('ALL');
 

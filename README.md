@@ -198,8 +198,8 @@ Test Result Analyzer
 |---|---|---|
 | **Backend** | Python 3.12 + FastAPI | REST API, webhook receiver, SSE streaming |
 | **Agent** | LangGraph | Explicit state-machine graph, no uncontrolled loops |
-| **LLM** | NVIDIA Nemotron via Nebius | Planning, code generation, review |
-| **Sandbox** | Nebius Token Factory | Isolated test execution (never on host) |
+| **LLM** | NVIDIA Nemotron via NVIDIA NIM API | Planning, code generation, review |
+| **Sandbox** | Isolated Docker / Container Sandbox | Isolated test execution (never on host) |
 | **Code indexing** | tree-sitter + pgvector | Semantic retrieval — only relevant chunks sent to model |
 | **Database** | PostgreSQL 16 + pgvector | Run state, code embeddings, audit trail |
 | **Queue** | Redis + Celery | Background task execution, SSE pub/sub |
@@ -213,7 +213,7 @@ Test Result Analyzer
 
 ## NVIDIA Nemotron Integration: 30B MoE Architecture
 
-RepoMedic is powered by **NVIDIA Nemotron 3.5 Lightning (30B A3B MoE)** (`nvidia/nemotron-3.5-lightning-30b-a3b`) running on **Nebius Token Factory / NVIDIA NIM API**.
+RepoMedic is powered by **NVIDIA Nemotron 3.5 Lightning (30B A3B MoE)** (`nvidia/nemotron-3.5-lightning-30b-a3b`) running on **NVIDIA NIM API** (`integrate.api.nvidia.com`).
 
 ### Why 30B MoE is the Optimal Model for Agentic Loops
 1. **Speed & Latency**: Mixture-of-Experts architecture activates only ~3.5B parameters per token out of 30B total, achieving <1.5s step latencies—crucial for responsive multi-turn agent feedback loops.
@@ -257,7 +257,7 @@ issue_analysis = await model_provider.planner.generate_structured(
 Built specifically for the **Nebius × NVIDIA Global AI Hackathon (Coding and Agentic Engineering Track)**. Here is how RepoMedic excels across all 4 official judging criteria and the sponsor challenge:
 
 ### 1. Technological Implementation (25%)
-- **NVIDIA Nemotron 3.5 Lightning (30B A3B MoE)** on Nebius Token Factory: Deployed with dynamic reasoning traces for high-precision code synthesis and self-healing.
+- **NVIDIA Nemotron 3.5 Lightning (30B A3B MoE)** via NVIDIA NIM API: Deployed with dynamic reasoning traces for high-precision code synthesis and self-healing.
 - **12-Node LangGraph Dynamic State Machine**: Explicit typed transitions with strict cycle bounds (`MAX_FIX_ITERATIONS=3`).
 - **Tree-sitter AST Polyglot Chunking**: Indexes function/class boundaries and call graphs to avoid naive line-based splitting.
 - **Hardened PatchValidator**: Sanitizes diffs, verifies path traversal prevention (`../`, `/etc`), and blocks binary or sensitive file modifications.
@@ -284,9 +284,9 @@ Built specifically for the **Nebius × NVIDIA Global AI Hackathon (Coding and Ag
 
 ---
 
-## Nebius Token Factory Integration
+## Execution Sandbox & NVIDIA NIM API Integration
 
-Two distinct Nebius integrations:
+Two core execution systems:
 
 ### 1. LLM Inference
 ```python
@@ -588,7 +588,7 @@ NEBIUS_BASE_URL=https://api.studio.nebius.ai/v1
 NEBIUS_SANDBOX_URL=                  # Token Factory sandbox endpoint
 NEBIUS_EMBEDDING_MODEL=BAAI/bge-en-icl
 
-# NVIDIA Nemotron — 30B MoE Model (Nebius Token Factory / NIM API)
+# NVIDIA Nemotron — 30B MoE Model (NVIDIA NIM API)
 NEMOTRON_PLANNER_MODEL=nvidia/nemotron-3.5-lightning-30b-a3b
 NEMOTRON_CODER_MODEL=nvidia/nemotron-3.5-lightning-30b-a3b
 NEMOTRON_FAST_MODEL=nvidia/nemotron-3.5-lightning-30b-a3b
@@ -628,7 +628,7 @@ make clean        # Remove containers and volumes
 ### ✅ Implemented (MVP)
 - Complete 12-node LangGraph state machine
 - NVIDIA Nemotron model abstraction (3 configurable slots, structured outputs)
-- Nebius Token Factory sandbox integration
+- Isolated execution sandbox integration (Docker / subprocess)
 - GitHub App authentication, webhook dispatch, PR creation
 - tree-sitter parsing + pgvector semantic code retrieval
 - pytest output parsing (JSON report + text fallback)

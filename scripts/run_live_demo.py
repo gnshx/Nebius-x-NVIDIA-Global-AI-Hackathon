@@ -51,7 +51,7 @@ RESET = "\033[0m"
 def print_banner():
     print(f"\n{BOLD}{CYAN}╔══════════════════════════════════════════════════════════════════════╗{RESET}")
     print(f"{BOLD}{CYAN}║     🩺 REPOMEDIC — AUTONOMOUS ISSUE-TO-PR VERIFICATION AGENT         ║{RESET}")
-    print(f"{BOLD}{CYAN}║     Powered by NVIDIA Nemotron on Nebius Token Factory               ║{RESET}")
+    print(f"{BOLD}{CYAN}║     Powered by NVIDIA Nemotron 3.5 Lightning via NVIDIA NIM API      ║{RESET}")
     print(f"{BOLD}{CYAN}╚══════════════════════════════════════════════════════════════════════╝{RESET}\n")
 
 

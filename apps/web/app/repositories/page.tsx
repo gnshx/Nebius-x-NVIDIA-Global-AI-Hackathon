@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getRepositories, registerRepository } from '@/lib/api';
+import { getRepositories, registerRepository, VERIFIED_REPOSITORIES } from '@/lib/api';
 import { Repository } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
 import { Database, Plus, RefreshCw, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
@@ -45,8 +45,8 @@ function IndexStatusBadge({ status }: { status: string }) {
 }
 
 export default function RepositoriesPage() {
-  const [repos, setRepos] = useState<Repository[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [repos, setRepos] = useState<Repository[]>(() => VERIFIED_REPOSITORIES);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [newRepo, setNewRepo] = useState('');

@@ -29,7 +29,7 @@ PITCH_SCRIPT = (
     "A pull request is never opened unless one hundred percent of unit and regression tests pass "
     "inside an isolated execution sandbox. "
     "At the heart of RepoMedic is NVIDIA Nemotron 3.5 Lightning, a thirty billion parameter "
-    "Mixture-of-Experts model running on Nebius Token Factory. "
+    "Mixture-of-Experts model running via NVIDIA NIM API. "
     "By activating just three-point-five billion parameters per token, Nemotron delivers lightning-fast "
     "step latencies under one-point-five seconds while generating full chain-of-thought reasoning traces. "
     "RepoMedic orchestrates twelve LangGraph state machine nodes: ingesting issues, parsing repository syntax "

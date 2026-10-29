@@ -67,7 +67,7 @@ export default function SettingsPage() {
         />
         <InfoRow
           label="Inference Provider"
-          value="Nebius Token Factory / NVIDIA NIM API"
+          value="NVIDIA NIM API (integrate.api.nvidia.com)"
         />
         <InfoRow
           label="External Research Engine"
@@ -133,7 +133,7 @@ export default function SettingsPage() {
           <p className="text-xs mt-2">
             See the{' '}
             <a
-              href="https://github.com/gojo/repomedic"
+              href="https://github.com/gnshx/Nebius-x-NVIDIA-Global-AI-Hackathon"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary underline-offset-2 underline inline-flex items-center gap-0.5"

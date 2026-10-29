@@ -21,6 +21,9 @@ import {
 } from 'lucide-react';
 import { AgentRun } from '@/lib/types';
 import { ThreeAgentVisualizer } from '@/components/ThreeAgentVisualizer';
+import { InteractiveArchitecturePipeline } from '@/components/InteractiveArchitecturePipeline';
+import { InteractiveWorkbenchPreview } from '@/components/InteractiveWorkbenchPreview';
+import { RepoMedicLogo } from '@/components/RepoMedicLogo';
 
 async function getStats() {
   try {
@@ -39,19 +42,19 @@ export default async function HomePage() {
     <div className="space-y-16 pb-16">
       {/* Track & Model Header Badges */}
       <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm">
           <Sparkles className="h-3.5 w-3.5" />
           Nebius × NVIDIA Global AI Hackathon
         </span>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-sm">
           <Layers className="h-3.5 w-3.5" />
           Coding & Agentic Engineering Track
         </span>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-sm">
           <Cpu className="h-3.5 w-3.5" />
           Nemotron 3.5 Lightning (30B MoE)
         </span>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-sm">
           <Search className="h-3.5 w-3.5" />
           Tavily API Drift Intelligence
         </span>
@@ -60,43 +63,46 @@ export default async function HomePage() {
       {/* Hero Section */}
       <section className="text-center space-y-6 max-w-4xl mx-auto">
         <div className="flex justify-center">
-          <img 
-            src="/assets/logo.jpg" 
-            alt="RepoMedic Logo" 
-            className="w-20 h-20 rounded-2xl shadow-2xl border border-border ring-2 ring-primary/20 object-cover" 
-          />
+          <RepoMedicLogo size="lg" className="animate-pulse-glow" />
         </div>
-        <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight">
+        <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-zinc-100 via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
           RepoMedic
         </h1>
         <p className="text-xl sm:text-2xl font-semibold text-foreground">
           Autonomous GitHub Issue-to-PR Verification Agent
         </p>
         <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-          Powered by <strong className="text-foreground">NVIDIA Nemotron 3.5 Lightning (30B MoE)</strong> on <strong className="text-foreground">Nebius Token Factory</strong>. Diagnoses issues, semantically retrieves code with Tree-sitter AST parsing, validates security constraints, and executes unit tests inside an isolated sandbox before opening <span className="text-emerald-400 font-semibold">100% test-verified pull requests</span>.
+          Powered by <strong className="text-foreground">NVIDIA Nemotron 3.5 Lightning (30B MoE)</strong> via <strong className="text-foreground">NVIDIA NIM API</strong>. Diagnoses issues, semantically retrieves code with Tree-sitter AST parsing, validates security constraints, and executes unit tests inside an isolated sandbox before opening <span className="text-emerald-400 font-semibold">100% test-verified pull requests</span>.
         </p>
 
         {/* Primary Action Buttons */}
         <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/runs"
-            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm shadow-lg"
+            className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 px-6 py-3 rounded-lg font-semibold transition-all text-sm shadow-lg shadow-emerald-500/20 active:scale-95"
           >
             Launch Live Dashboard <ArrowRight className="h-4 w-4" />
           </Link>
           <a
             href="#threejs-canvas"
-            className="inline-flex items-center gap-2 border bg-card px-5 py-3 rounded-lg font-medium hover:bg-muted/50 transition-colors text-sm"
+            className="inline-flex items-center gap-2 border border-zinc-800 bg-card/80 backdrop-blur-sm px-5 py-3 rounded-lg font-medium hover:bg-muted/50 hover:border-zinc-700 transition-all text-sm"
           >
             <Box className="h-4 w-4 text-emerald-400" />
             Interactive 3D Agent Canvas
           </a>
           <a
-            href="#opensource-proof"
-            className="inline-flex items-center gap-2 border bg-card px-5 py-3 rounded-lg font-medium hover:bg-muted/50 transition-colors text-sm"
+            href="#architecture-pipeline"
+            className="inline-flex items-center gap-2 border border-zinc-800 bg-card/80 backdrop-blur-sm px-5 py-3 rounded-lg font-medium hover:bg-muted/50 hover:border-zinc-700 transition-all text-sm"
           >
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-            Real Open-Source Proof
+            <Layers className="h-4 w-4 text-cyan-400" />
+            Interactive Pipeline Flow
+          </a>
+          <a
+            href="#developer-workbench"
+            className="inline-flex items-center gap-2 border border-zinc-800 bg-card/80 backdrop-blur-sm px-5 py-3 rounded-lg font-medium hover:bg-muted/50 hover:border-zinc-700 transition-all text-sm"
+          >
+            <Terminal className="h-4 w-4 text-purple-400" />
+            Live Workbench
           </a>
         </div>
       </section>
@@ -204,14 +210,28 @@ export default async function HomePage() {
             </h3>
             
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-              <div className="p-3 rounded-lg bg-muted/40 border">
+              <a 
+                href="https://github.com/python-humanize/humanize"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 rounded-lg bg-muted/40 border hover:border-primary/50 transition-colors block group"
+              >
                 <span className="text-xs text-muted-foreground block">Target Repo</span>
-                <span className="font-mono text-xs font-bold truncate block">humanize (2.5k★)</span>
-              </div>
-              <div className="p-3 rounded-lg bg-muted/40 border">
-                <span className="text-xs text-muted-foreground block">Issue Number</span>
-                <span className="font-mono text-xs font-bold text-amber-400 block">Issue #466</span>
-              </div>
+                <span className="font-mono text-xs font-bold truncate block group-hover:text-primary flex items-center justify-center gap-1">
+                  humanize (2.5k★) <ExternalLink className="h-3 w-3 opacity-60" />
+                </span>
+              </a>
+              <a 
+                href="https://github.com/python-humanize/humanize/issues/466"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 rounded-lg bg-muted/40 border hover:border-amber-500/50 transition-colors block group"
+              >
+                <span className="text-xs text-muted-foreground block">Target Issue</span>
+                <span className="font-mono text-xs font-bold text-amber-400 block group-hover:underline flex items-center justify-center gap-1">
+                  Issue #466 <ExternalLink className="h-3 w-3 opacity-60" />
+                </span>
+              </a>
               <div className="p-3 rounded-lg bg-muted/40 border">
                 <span className="text-xs text-muted-foreground block">Sandbox Tests</span>
                 <span className="font-mono text-xs font-bold text-emerald-400 block">241/241 Passed</span>
@@ -275,10 +295,11 @@ export default async function HomePage() {
             </div>
 
             <Link
-              href="/runs"
-              className="w-full text-center py-2.5 px-4 rounded-lg bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80 transition-colors"
+              href="/runs/55f677a5-01af-4011-857a-bbc83740a908"
+              className="w-full text-center py-2.5 px-4 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5 shadow-sm"
             >
-              View Full Run Details
+              <span>View Full 12-Step In-App Trace</span>
+              <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </div>
@@ -309,7 +330,7 @@ export default async function HomePage() {
             </div>
             <ul className="text-sm text-muted-foreground space-y-2 list-disc list-inside">
               <li>
-                <strong className="text-foreground">Nemotron 3.5 Lightning (30B A3B):</strong> 30 billion total parameters with ~3.5 billion active per token hosted on Nebius Token Factory with streaming chain-of-thought tokens (<code className="text-xs bg-muted px-1 py-0.5 rounded font-mono">enable_thinking=True</code>).
+                <strong className="text-foreground">Nemotron 3.5 Lightning (30B A3B):</strong> 30 billion total parameters with ~3.5 billion active per token served via NVIDIA NIM with streaming chain-of-thought tokens (<code className="text-xs bg-muted px-1 py-0.5 rounded font-mono">enable_thinking=True</code>).
               </li>
               <li>
                 <strong className="text-foreground">12-Node Cyclic LangGraph:</strong> Full state machine with triager, planner, coder, test synthesizer, reflection, and gate nodes.
@@ -416,51 +437,56 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Architecture Infographic Showcase */}
-      <section className="space-y-4">
+      {/* Interactive System Architecture Pipeline Component */}
+      <section id="architecture-pipeline" className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight">System Architecture Infographic</h2>
-            <p className="text-sm text-muted-foreground">
-              End-to-end multi-agent workflow powered by NVIDIA Nemotron 3.5 Lightning (30B MoE), Nebius Sandbox, and Tavily
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-2">
+              <Layers className="h-3.5 w-3.5" />
+              Live Interactive Architecture
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              Interactive 5-Stage System Pipeline
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Click through the stages or simulate live execution to inspect AST trees, chain-of-thought tokens, and sandbox verification.
             </p>
           </div>
-          <span className="text-xs font-mono bg-muted px-2.5 py-1 rounded border">
-            LangGraph 12-Node Flow
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded">
+              12 Nodes Active • LangGraph Cyclic
+            </span>
+          </div>
         </div>
-        <div className="rounded-2xl border bg-card p-2 overflow-hidden shadow-md">
-          <img
-            src="/assets/architecture.jpg"
-            alt="RepoMedic System Architecture Infographic"
-            className="w-full rounded-xl object-cover hover:scale-[1.01] transition-transform duration-300"
-          />
-        </div>
+        
+        <InteractiveArchitecturePipeline />
       </section>
 
-      {/* Dashboard Preview Showcase */}
-      <section className="space-y-4">
+      {/* Interactive Developer Workbench & Execution Environment */}
+      <section id="developer-workbench" className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight">Live Developer Dashboard Preview</h2>
-            <p className="text-sm text-muted-foreground">
-              Real-time execution dashboard showing 16/16 sandbox tests passing and verified GitHub PR creation
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 mb-2">
+              <Terminal className="h-3.5 w-3.5" />
+              Interactive Developer Workbench
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              Live Verification Workbench & Diff Viewer
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Switch between the unified syntax-highlighted diff, interactive pytest sandbox runner, and Nemotron 30B reasoning inspector.
             </p>
           </div>
           <Link 
-            href="/runs" 
-            className="text-xs font-medium text-primary hover:underline flex items-center gap-1"
+            href="/runs/55f677a5-01af-4011-857a-bbc83740a908" 
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-lg hover:bg-emerald-500/20 transition-colors shrink-0"
           >
-            Explore Dashboard <ArrowRight className="h-3 w-3" />
+            <span>Open Full Telemetry Page</span>
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
-        <div className="rounded-2xl border bg-card p-2 overflow-hidden shadow-md">
-          <img
-            src="/assets/dashboard.jpg"
-            alt="RepoMedic Live Developer Dashboard"
-            className="w-full rounded-xl object-cover hover:scale-[1.01] transition-transform duration-300"
-          />
-        </div>
+        
+        <InteractiveWorkbenchPreview />
       </section>
 
       {/* Live Agent Execution History */}
