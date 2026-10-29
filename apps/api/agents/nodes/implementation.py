@@ -27,20 +27,37 @@ _TOP_CHUNKS = 8
 class PatchValidator:
     """Security-oriented validator for generated patches."""
 
-    BLOCKED_PATH_PATTERNS = [".git/", "..", "/etc/", "/proc/"]
-    BLOCKED_EXTENSIONS = [".pem", ".key", ".env", ".p12"]
+    BLOCKED_PATH_PATTERNS = [".git/", "..", "/etc/", "/proc/", "\\..", "%2e%2e", "~"]
+    BLOCKED_EXTENSIONS = [
+        ".pem", ".key", ".env", ".p12", ".crt", ".pfx", 
+        ".secret", ".token", ".id_rsa", ".id_ed25519"
+    ]
+    MAX_FILE_DIFF_BYTES = 250_000  # 250 KB max per file diff to prevent memory bombs
 
     def validate(self, patch: Patch) -> None:
         """Raise ValueError if any FileChange violates security rules."""
         for change in patch.files:
-            if change.path.startswith("/"):
+            if change.path.startswith("/") or change.path.startswith("\\"):
                 raise ValueError(f"Absolute path rejected: {change.path}")
+            
+            # Canonical path traversal check
+            norm_path = change.path.replace("\\", "/")
+            if norm_path.startswith("../") or "/../" in norm_path or norm_path == "..":
+                raise ValueError(f"Blocked path pattern (directory traversal): {change.path}")
+
             for pattern in self.BLOCKED_PATH_PATTERNS:
                 if pattern in change.path:
                     raise ValueError(f"Blocked path pattern in: {change.path}")
+
             for ext in self.BLOCKED_EXTENSIONS:
-                if change.path.endswith(ext):
+                if change.path.lower().endswith(ext):
                     raise ValueError(f"Blocked file extension: {change.path}")
+
+            # Diff explosion check
+            if len(change.patch.encode("utf-8")) > self.MAX_FILE_DIFF_BYTES:
+                raise ValueError(
+                    f"Patch exceeds maximum allowed size ({len(change.patch)} > {self.MAX_FILE_DIFF_BYTES} bytes): {change.path}"
+                )
 
 
 _validator = PatchValidator()
