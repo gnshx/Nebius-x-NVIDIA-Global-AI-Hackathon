@@ -52,12 +52,13 @@ def main():
     # Simple, high-quality ffmpeg command to create 1080p video from slides
     temp_concat_txt = assets_dir / "slides.txt"
     with open(temp_concat_txt, "w") as f:
-        f.write(f"file '{arch_img}'\nduration 12\n")
-        f.write(f"file '{dash_img}'\nduration 15\n")
         f.write(f"file '{arch_img}'\nduration 15\n")
         f.write(f"file '{dash_img}'\nduration 20\n")
-        f.write(f"file '{arch_img}'\nduration 15\n")
-        f.write(f"file '{dash_img}'\n")
+        f.write(f"file '{arch_img}'\nduration 20\n")
+        f.write(f"file '{dash_img}'\nduration 25\n")
+        f.write(f"file '{arch_img}'\nduration 20\n")
+        f.write(f"file '{dash_img}'\nduration 25\n")
+        f.write(f"file '{arch_img}'\n")
 
     cmd = [
         "ffmpeg",
