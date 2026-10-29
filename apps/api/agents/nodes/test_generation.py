@@ -18,6 +18,7 @@ from agents.state import RepoMedicState
 from models.enums import StepType
 from models.schemas import FileChange, Patch
 from services.nebius.client import Message, model_provider
+from services.mutation_tester import MutationTester
 
 logger = structlog.get_logger(__name__)
 
@@ -124,7 +125,12 @@ async def run(state: RepoMedicState) -> dict:
         total_files_in_patch=len(merged_patch["files"]),
     )
 
+    # Audit test oracle robustness and discriminative quality via MutationTester
+    test_diff_combined = "\n".join(fc.diff for fc in test_patch.files)
+    test_quality_report = MutationTester.audit_test_diff(test_diff_combined)
+
     return {
         "current_patch": merged_patch,
         "generated_tests": [fc.model_dump() for fc in test_patch.files],
+        "test_quality": test_quality_report.to_dict(),
     }
