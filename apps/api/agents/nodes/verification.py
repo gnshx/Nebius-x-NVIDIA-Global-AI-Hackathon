@@ -21,8 +21,10 @@ import structlog
 from agents.nodes.base import node_context
 from agents.state import RepoMedicState
 from models.enums import StepType
-from models.schemas import PatchReview
+from models.schemas import Patch, PatchReview
 from services.nebius.client import Message, model_provider
+from services.oracle_evaluator import OracleEvaluator
+from services.patch_minimizer import PatchMinimizer
 
 logger = structlog.get_logger(__name__)
 
@@ -63,6 +65,21 @@ async def run(state: RepoMedicState) -> dict:
         f"Total: {test_result.get('tests_total')}"
     )
 
+    # Evaluate SWE-bench dual oracle (F->P vs P->P)
+    generated_tests = state.get("generated_tests") or []
+    try:
+        patch_obj = Patch(**current_patch) if current_patch.get("files") else Patch(summary="Review", files=[])
+        patch_metrics = PatchMinimizer.evaluate_metrics(patch_obj)
+        cleanliness = patch_metrics.cleanliness_score
+    except Exception:
+        cleanliness = 1.0
+
+    oracle_eval = OracleEvaluator.evaluate(
+        test_result=test_result,
+        generated_tests=generated_tests,
+        cleanliness_score=cleanliness,
+    )
+
     messages = [
         Message(
             role="user",
@@ -82,6 +99,12 @@ async def run(state: RepoMedicState) -> dict:
                 "## Test Results\n"
                 f"Success: {test_result.get('success', False)}\n"
                 f"{test_summary}\n\n"
+                "## SWE-bench Dual Oracle Metrics\n"
+                f"Verdict: {oracle_eval.verdict.value}\n"
+                f"Fail-to-Pass (F->P): {oracle_eval.fail_to_pass_passed}/{oracle_eval.fail_to_pass_count} resolved\n"
+                f"Pass-to-Pass (P->P): {oracle_eval.pass_to_pass_passed}/{oracle_eval.pass_to_pass_total} maintained\n"
+                f"Cleanliness Score: {oracle_eval.cleanliness_score * 100:.1f}%\n"
+                f"Details: {oracle_eval.details}\n\n"
                 "Review this patch. Flag any suspicious changes, incomplete fixes, "
                 "or tests that do not adequately cover the regression scenario. "
                 "Be strict: only approve if you are confident the issue is genuinely resolved."
@@ -111,4 +134,7 @@ async def run(state: RepoMedicState) -> dict:
         summary=review.summary[:120],
     )
 
-    return {"patch_review": review.model_dump()}
+    return {
+        "patch_review": review.model_dump(),
+        "oracle_evaluation": oracle_eval.to_dict(),
+    }

@@ -196,6 +196,8 @@ class PatchReview(BaseModel):
     suspicious_changes: list[str]
     remaining_risks: list[str]
     summary: str
+    confidence: float = Field(default=1.0, ge=0.0, le=1.0)
+    verdict: str = "RESOLVED"
 
 
 # ---------------------------------------------------------------------------
