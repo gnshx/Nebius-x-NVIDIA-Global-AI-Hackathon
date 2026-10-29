@@ -17,6 +17,7 @@ from agents.state import RepoMedicState
 from models.enums import StepType
 from models.schemas import Patch
 from services.nebius.client import Message, model_provider
+from services.patch_minimizer import PatchMinimizer
 
 logger = structlog.get_logger(__name__)
 
@@ -140,6 +141,7 @@ async def run(state: RepoMedicState) -> dict:
     ):
         patch: Patch = await model_provider.coder.generate_structured(messages, Patch)
         _validator.validate(patch)
+        patch = PatchMinimizer.minimize(patch)
 
     patch_dict = patch.model_dump()
     patch_history.append(patch_dict)
