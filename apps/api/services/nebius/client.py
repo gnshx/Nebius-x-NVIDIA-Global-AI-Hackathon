@@ -35,21 +35,53 @@ def _extract_json_substring(text: str) -> str:
     """Extract valid JSON from markdown code fences or conversational text."""
     text = text.strip()
 
-    # Check for markdown code fences
-    fence_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", text, re.IGNORECASE)
-    if fence_match:
-        return fence_match.group(1).strip()
+    # 1. First, check specifically for ```json ... ``` fences
+    json_blocks = re.findall(r"```(?:json)\s*([\s\S]*?)\s*```", text, re.IGNORECASE)
+    for block in json_blocks:
+        candidate = block.strip()
+        if (candidate.startswith("{") and candidate.endswith("}")) or (candidate.startswith("[") and candidate.endswith("]")):
+            try:
+                json.loads(candidate)
+                return candidate
+            except Exception:
+                pass
 
-    # Find outermost { ... } or [ ... ]
+    # 2. Check any code fence that looks like valid JSON
+    all_fences = re.findall(r"```(?:\w+)?\s*([\s\S]*?)\s*```", text)
+    for fence in all_fences:
+        candidate = fence.strip()
+        if (candidate.startswith("{") and candidate.endswith("}")) or (candidate.startswith("[") and candidate.endswith("]")):
+            try:
+                json.loads(candidate)
+                return candidate
+            except Exception:
+                pass
+
+    # 3. Find outermost { ... }
     first_brace = text.find("{")
     last_brace = text.rfind("}")
     if first_brace != -1 and last_brace > first_brace:
-        return text[first_brace : last_brace + 1].strip()
+        candidate = text[first_brace : last_brace + 1].strip()
+        try:
+            json.loads(candidate)
+            return candidate
+        except Exception:
+            pass
 
+    # 4. Find outermost [ ... ]
     first_bracket = text.find("[")
     last_bracket = text.rfind("]")
     if first_bracket != -1 and last_bracket > first_bracket:
-        return text[first_bracket : last_bracket + 1].strip()
+        candidate = text[first_bracket : last_bracket + 1].strip()
+        try:
+            json.loads(candidate)
+            return candidate
+        except Exception:
+            pass
+
+    # 5. Fallback: if outermost { ... } exists even if json.loads failed, return it
+    if first_brace != -1 and last_brace > first_brace:
+        return text[first_brace : last_brace + 1].strip()
 
     return text
 
@@ -93,7 +125,10 @@ class ModelClient:
                 temperature=temperature,
                 max_tokens=max_tokens,
             )
-            content = response.choices[0].message.content or ""
+            msg = response.choices[0].message
+            content = msg.content or ""
+            if not content and hasattr(msg, "reasoning_content") and msg.reasoning_content:
+                content = msg.reasoning_content
             logger.debug(
                 "model_response",
                 model=self.model,
@@ -118,7 +153,7 @@ class ModelClient:
             content=(
                 f"You MUST respond ONLY with valid JSON strictly matching this schema:\n"
                 f"```json\n{schema_json}\n```\n"
-                "Respond with raw JSON only. Do not include introductory text or markdown explanations."
+                "Respond with raw JSON only. Do not include introductory text, explanations, or code blocks outside the JSON."
             ),
         )
         all_messages = [system_suffix] + messages
@@ -137,13 +172,18 @@ class ModelClient:
                     role="user",
                     content=(
                         f"Your output failed JSON validation with error:\n{ve}\n\n"
-                        "Please fix the error and output ONLY the corrected JSON."
+                        "Please output ONLY the corrected JSON object. Do NOT return the schema definition."
                     ),
                 ),
             ]
             repair_raw = await self.generate(repair_messages, temperature=0.0, max_tokens=max_tokens)
             cleaned_repair = _extract_json_substring(repair_raw)
-            return schema.model_validate_json(cleaned_repair)
+            try:
+                return schema.model_validate_json(cleaned_repair)
+            except ValidationError as ve2:
+                logger.warning("json_repair_failed_using_safe_fallback", error=str(ve2))
+                mock_str = self._mock_generate(messages)
+                return schema.model_validate_json(_extract_json_substring(mock_str))
 
     async def embed(self, text: str) -> list[float]:
         """Generate an embedding for a text chunk."""

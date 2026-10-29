@@ -33,11 +33,11 @@ class PatchValidator:
     def validate(self, patch: Patch) -> None:
         """Raise ValueError if any FileChange violates security rules."""
         for change in patch.files:
+            if change.path.startswith("/"):
+                raise ValueError(f"Absolute path rejected: {change.path}")
             for pattern in self.BLOCKED_PATH_PATTERNS:
                 if pattern in change.path:
                     raise ValueError(f"Blocked path pattern in: {change.path}")
-            if change.path.startswith("/"):
-                raise ValueError(f"Absolute path rejected: {change.path}")
             for ext in self.BLOCKED_EXTENSIONS:
                 if change.path.endswith(ext):
                     raise ValueError(f"Blocked file extension: {change.path}")

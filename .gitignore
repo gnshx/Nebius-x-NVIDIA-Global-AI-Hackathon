@@ -79,3 +79,5 @@ tmp/
 temp/
 *.tmp
 *.bak
+test_repos/
+*.tsbuildinfo

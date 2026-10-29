@@ -97,9 +97,9 @@ class Settings(BaseSettings):
     nebius_embedding_model: str = "BAAI/bge-en-icl"
 
     # Model slots — configurable, never hard-coded in agent nodes
-    nemotron_planner_model: str = "nvidia/llama-3.1-nemotron-70b-instruct"
-    nemotron_coder_model: str = "nvidia/llama-3.1-nemotron-70b-instruct"
-    nemotron_fast_model: str = "nvidia/llama-3.1-nemotron-8b-instruct"
+    nemotron_planner_model: str = "nvidia/nemotron-3.5-lightning-30b-a3b"
+    nemotron_coder_model: str = "nvidia/nemotron-3.5-lightning-30b-a3b"
+    nemotron_fast_model: str = "nvidia/nemotron-3.5-lightning-30b-a3b"
 
     # -------------------------------------------------------------------------
     # Nebius Token Factory — Sandbox

@@ -117,7 +117,7 @@ async def main():
     print(f"    {DIM}Retrieved chunks:{RESET} {len(state.get('retrieved_context', []))} relevant code blocks")
 
     # Step 4: Implementation Planning
-    print_step("📋", "4. Planning", "Nemotron 70B Reasoning Plan")
+    print_step("📋", "4. Planning", "Nemotron 3.5 Lightning (30B MoE) Reasoning Plan")
     from agents.nodes.planning import run as run_planning
     res4 = await run_planning(state)
     state.update(res4)

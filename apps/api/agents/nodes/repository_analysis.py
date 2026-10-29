@@ -81,22 +81,24 @@ async def run(state: RepoMedicState) -> dict:
         model_used,
         {"repo": full_name},
     ):
-        # 1. Check if analyzing the local demo repository
-        is_demo = "demo" in full_name.lower() or not installation_id
-        demo_dir = Path("demo")
+        # 1. Check if analyzing a local repository or demo directory
+        custom_repo = state.get("repo_dir")
+        local_dir = Path(custom_repo) if custom_repo and Path(custom_repo).exists() else None
+        if not local_dir and ("demo" in full_name.lower() or not installation_id) and Path("demo").exists():
+            local_dir = Path("demo")
 
-        if is_demo and demo_dir.exists():
-            for p in demo_dir.rglob("*"):
-                if p.is_file() and not any(ign in str(p) for ign in [".git", "__pycache__", ".pytest_cache"]):
-                    rel_p = str(p.relative_to(demo_dir))
+        if local_dir:
+            for p in local_dir.rglob("*"):
+                if p.is_file() and not any(ign in str(p) for ign in [".git", "__pycache__", ".pytest_cache", ".venv"]):
+                    rel_p = str(p.relative_to(local_dir))
                     all_paths.append(rel_p)
                     if p.suffix == ".py" or p.name in ["pyproject.toml", "requirements.txt"]:
                         try:
                             file_contents[rel_p] = p.read_text(encoding="utf-8")
                         except Exception:
                             pass
-            snapshot_path = _create_local_snapshot(demo_dir)
-            repo_meta["name"] = "demo-utils"
+            snapshot_path = _create_local_snapshot(local_dir)
+            repo_meta["name"] = full_name.split("/")[-1] if "/" in full_name else full_name
             repo_meta["language"] = "Python"
         else:
             try:

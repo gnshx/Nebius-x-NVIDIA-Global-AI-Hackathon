@@ -106,6 +106,7 @@ class FailingTestSchema(BaseModel):
 
 
 class TestResultSchema(BaseModel):
+    __test__ = False
     success: bool
     exit_code: int
     stdout: str

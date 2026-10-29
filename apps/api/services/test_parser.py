@@ -54,8 +54,17 @@ class TestResultParser:
         duration_seconds: float,
     ) -> TestResultSchema | None:
         """Try to find and parse --json-report JSON in stdout."""
+        # First try parsing full stdout as JSON
+        stripped_stdout = stdout.strip()
+        if stripped_stdout.startswith("{") and "\"summary\"" in stripped_stdout:
+            try:
+                data = json.loads(stripped_stdout)
+                return self._from_json_report(data, exit_code, stdout, stderr, duration_seconds)
+            except (json.JSONDecodeError, KeyError):
+                pass
+
         # json-report writes to .report.json by default; some setups print it
-        # Also support inline JSON blocks
+        # Also support single-line JSON blocks
         for line in stdout.splitlines():
             stripped = line.strip()
             if stripped.startswith("{") and "\"summary\"" in stripped:
@@ -155,10 +164,10 @@ class TestResultParser:
             stdout=stdout,
             stderr=stderr,
             duration_seconds=duration_seconds,
-            tests_total=total or None,
-            tests_passed=passed or None,
-            tests_failed=failed or None,
-            tests_skipped=skipped or None,
+            tests_total=total,
+            tests_passed=passed,
+            tests_failed=failed,
+            tests_skipped=skipped,
             failure_summary=self._build_summary(failing_tests),
             failing_tests=failing_tests,
         )

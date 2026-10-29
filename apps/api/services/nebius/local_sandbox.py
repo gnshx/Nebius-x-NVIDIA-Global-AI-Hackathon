@@ -203,7 +203,7 @@ class LocalSandboxExecutor:
         timed_out = False
         try:
             env = os.environ.copy()
-            env["PYTHONPATH"] = f"{workdir}:{env.get('PYTHONPATH', '')}"
+            env["PYTHONPATH"] = f"{workdir}:{workdir}/src:{env.get('PYTHONPATH', '')}"
 
             proc = await asyncio.create_subprocess_exec(
                 *cmd_args,

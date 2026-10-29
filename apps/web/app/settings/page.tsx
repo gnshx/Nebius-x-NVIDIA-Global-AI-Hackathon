@@ -54,26 +54,32 @@ export default function SettingsPage() {
         <InfoRow label="Frontend Version" value="0.1.0" />
       </Section>
 
-      {/* Model Configuration */}
-      <Section title="Model Configuration" icon={<Key className="h-5 w-5 text-muted-foreground" />}>
+      {/* Model & Agent Configuration */}
+      <Section title="Model & Agent Configuration" icon={<Key className="h-5 w-5 text-muted-foreground" />}>
         <InfoRow
-          label="Reasoning Model"
-          value={process.env.REASONING_MODEL ?? 'nvidia/llama-3.1-nemotron-ultra-253b-v1'}
+          label="Core Agentic Model"
+          value={process.env.REASONING_MODEL ?? 'nvidia/nemotron-3.5-lightning-30b-a3b'}
           mono
         />
         <InfoRow
-          label="Fast Model"
-          value={process.env.FAST_MODEL ?? 'meta/llama-3.3-70b-instruct'}
-          mono
+          label="Model Architecture"
+          value="Mixture-of-Experts (30B Total, ~3B Active) + Chain-of-Thought Reasoning"
         />
         <InfoRow
-          label="Embedding Model"
-          value={process.env.EMBEDDING_MODEL ?? 'nvidia/llama-3.2-nv-embedqa-1b-v2'}
-          mono
+          label="Inference Provider"
+          value="Nebius Token Factory / NVIDIA NIM API"
         />
         <InfoRow
-          label="Provider"
-          value="Nebius AI (NVIDIA NIM)"
+          label="External Research Engine"
+          value="Tavily AI Search (Dependency & API Drift Intelligence)"
+        />
+        <InfoRow
+          label="Execution Sandbox"
+          value="Isolated Python Subprocess / Docker Container (300s hard timeout)"
+        />
+        <InfoRow
+          label="Verification Policy"
+          value="Zero Hallucinated PRs: 100% test pass required before PR generation"
         />
       </Section>
 
