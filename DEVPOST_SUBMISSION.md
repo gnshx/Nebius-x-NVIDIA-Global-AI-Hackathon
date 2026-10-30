@@ -8,7 +8,8 @@
 - **Elevator Pitch / Tagline:** Zero-hallucination autonomous program repair agent powered by NVIDIA Nemotron 30B MoE via NVIDIA NIM & hermetic container execution. Diagnoses bugs, generates AST-causal fixes, and verifies 100% test passing before opening PRs.
 - **Submission Track:** Coding & Agentic Engineering (Nebius & NVIDIA Track)
 - **Repository URL:** [https://github.com/gnshx/Nebius-x-NVIDIA-Global-AI-Hackathon](https://github.com/gnshx/Nebius-x-NVIDIA-Global-AI-Hackathon)
-- **Demo Video:** `assets/repomedic_demo.mp4` (1080p Full HD, 2m 24s, 4.12 MB)
+- **Demo Video (YouTube):** [https://youtu.be/h__1uKTTd10](https://youtu.be/h__1uKTTd10) (1080p Full HD, 2m 24s)
+- **Demo Video (Direct MP4):** `assets/repomedic_demo.mp4` (4.12 MB)
 - **Real-World PR Proof:** [python-humanize/humanize #467](https://github.com/python-humanize/humanize/pull/467)
 - **Real-World Bug Issue:** [python-humanize/humanize #466](https://github.com/python-humanize/humanize/issues/466)
 
@@ -99,3 +100,13 @@ Mixture-of-Experts (MoE) architectures like NVIDIA Nemotron 30B MoE excel at sur
 ## Built With
 
 `python` · `nvidia-nim` · `nemotron-3-moe` · `nebius` · `docker` · `langgraph` · `fastapi` · `tree-sitter` · `nextjs` · `threejs` · `tailwind-css` · `typescript`
+
+---
+
+## Try It Out & Links
+
+- **YouTube Demo Video:** [https://youtu.be/h__1uKTTd10](https://youtu.be/h__1uKTTd10)
+- **GitHub Repository:** [https://github.com/gnshx/Nebius-x-NVIDIA-Global-AI-Hackathon](https://github.com/gnshx/Nebius-x-NVIDIA-Global-AI-Hackathon)
+- **Live Pull Request on python-humanize:** [https://github.com/python-humanize/humanize/pull/467](https://github.com/python-humanize/humanize/pull/467)
+- **Reported Bug Issue on python-humanize:** [https://github.com/python-humanize/humanize/issues/466](https://github.com/python-humanize/humanize/issues/466)
+- **Direct 1080p MP4 File:** `assets/repomedic_demo.mp4`

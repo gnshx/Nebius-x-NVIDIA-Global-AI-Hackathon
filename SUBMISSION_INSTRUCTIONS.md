@@ -18,9 +18,9 @@ Follow these steps to submit RepoMedic to the **Nebius x NVIDIA Global AI Hackat
 - **GitHub Repository URL:**  
   `https://github.com/gnshx/Nebius-x-NVIDIA-Global-AI-Hackathon`
 
-- **Video Demo URL:**  
-  Upload `repomedic/assets/repomedic_demo.mp4` to YouTube (Unlisted or Public) or Loom/Vimeo, and paste the URL in Devpost.  
-  *(The video file is located at `repomedic/assets/repomedic_demo.mp4`, 1920x1080 Full HD, 144.3s duration, 4.12 MB).*
+- **Video Demo URL (Paste in Devpost):**  
+  `https://youtu.be/h__1uKTTd10`  
+  *(1080p Full HD, 2m 24s duration, official submission demo).*
 
 - **Story & Description:**  
   Copy the full markdown from `repomedic/DEVPOST_SUBMISSION.md` directly into the "About the Project" text area.

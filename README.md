@@ -10,6 +10,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![Tests](https://img.shields.io/badge/Unit%20Tests-256%20Passed-10b981?style=flat-square&logo=pytest&logoColor=white)](tests/)
+[![YouTube](https://img.shields.io/badge/YouTube-Watch%20Demo%20(1080p)-FF0000?style=flat-square&logo=youtube&logoColor=white)](https://youtu.be/h__1uKTTd10)
 [![Model](https://img.shields.io/badge/NVIDIA%20NIM-Nemotron%203.5%20Lightning%20(30B%20MoE)-76B900?style=flat-square&logo=nvidia&logoColor=white)](https://build.nvidia.com)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![LangGraph](https://img.shields.io/badge/LangGraph-0.2-7C3AED?style=flat-square)](https://langchain-ai.github.io/langgraph)
@@ -20,7 +21,7 @@
 
 <br/>
 
-[**Watch 1080p Video Walkthrough**](#-submission-video-walkthrough) · [**Live Demo**](#running-the-demo) · [**Architecture**](#architecture) · [**Real-World Proof**](#-real-world-open-source-proof-python-humanize-466) · [**Quick Start**](#quick-start)
+[**📺 Watch 1080p Demo (YouTube)**](https://youtu.be/h__1uKTTd10) · [**Live Demo**](#running-the-demo) · [**Architecture**](#architecture) · [**Real-World Proof**](#-real-world-open-source-proof-python-humanize-466) · [**Quick Start**](#quick-start)
 
 </div>
 
@@ -28,7 +29,14 @@
 
 ## 🎬 Submission Video Walkthrough
 
-> **[▶ Download & Watch 1080p Demo Video (assets/repomedic_demo.mp4)](assets/repomedic_demo.mp4)**  
+<div align="center">
+
+[![Watch Demo on YouTube](https://img.shields.io/badge/YouTube-Watch%20Official%20Submission%20Demo%20(1080p)-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/h__1uKTTd10)
+
+</div>
+
+> 📺 **YouTube Link:** **[https://youtu.be/h__1uKTTd10](https://youtu.be/h__1uKTTd10)**  
+> 💾 **Local 1080p MP4:** **[Download assets/repomedic_demo.mp4](assets/repomedic_demo.mp4)**  
 > *Duration: 2 minutes 24.3 seconds (144.3s) • Resolution: 1920×1080 @ 30fps Full HD • Audio: Local Neural TTS • Size: 4.12 MB*
 
 The demo video showcases RepoMedic in action, featuring:

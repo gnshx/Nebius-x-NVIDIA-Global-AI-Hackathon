@@ -138,7 +138,16 @@ export function DemoVideoPlayer() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+          <a
+            href="https://youtu.be/h__1uKTTd10"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600/90 hover:bg-red-500 text-white transition-all shadow-sm"
+          >
+            <Video className="h-3.5 w-3.5" />
+            Watch on YouTube
+          </a>
           <a
             href="https://github.com/python-humanize/humanize/pull/467"
             target="_blank"
