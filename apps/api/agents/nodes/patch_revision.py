@@ -21,6 +21,7 @@ from services.nebius.client import Message, model_provider
 from services.patch_minimizer import PatchMinimizer
 from services.log_pruner import RuntimeLogPruner
 from services.cross_validator import PatchCrossValidator
+from services.sampling_adapter import DynamicSamplingAdapter
 
 logger = structlog.get_logger(__name__)
 
@@ -110,11 +111,21 @@ async def run(state: RepoMedicState) -> dict:
         ),
     ]
 
+    # Calibrate dynamic sampling hyperparameters (TTC / SWE-Reasoner 2026)
+    failure_delta = state.get("failure_delta") or {}
+    delta_verdict = failure_delta.get("delta_verdict")
+    sampling_config = DynamicSamplingAdapter.calibrate(
+        iteration=iteration,
+        delta_verdict=delta_verdict,
+    )
+
     logger.info(
         "patch_revision_start",
         run_id=run_id,
         iteration=iteration,
         failure_category=failure_analysis.get("category"),
+        sampling_mode=sampling_config.sampling_mode,
+        temperature=sampling_config.temperature,
     )
 
     async with node_context(
@@ -122,7 +133,11 @@ async def run(state: RepoMedicState) -> dict:
         StepType.PATCH_REVISION,
         iteration,
         model_used,
-        {"iteration": iteration, "failure_category": failure_analysis.get("category")},
+        {
+            "iteration": iteration,
+            "failure_category": failure_analysis.get("category"),
+            "sampling_config": sampling_config.to_dict(),
+        },
     ):
         revised_patch: Patch = await model_provider.coder.generate_structured(
             messages, Patch
@@ -149,4 +164,5 @@ async def run(state: RepoMedicState) -> dict:
         "patch_history": patch_history,
         "cross_validation": cross_val_report.to_dict(),
         "log_pruning": log_pruning.to_dict(),
+        "sampling_config": sampling_config.to_dict(),
     }

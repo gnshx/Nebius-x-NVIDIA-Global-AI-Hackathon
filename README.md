@@ -274,7 +274,7 @@ Built specifically for the **Nebius × NVIDIA Global AI Hackathon (Coding and Ag
 - **Rich GitHub Pull Request Output**: Auto-formats PR descriptions with reproduction scripts, root-cause explanations, and test verification proof.
 
 ### 4. Potential Impact & Feasibility (25%)
-- **Reduces Maintainer Burnout**: Open-source maintainers spend 40% of their time triaging issues and testing broken fixes. RepoMedic compresses issue-to-verified-PR to under 60 seconds.
+- **Reduces Maintainer Burnout**: Open-source maintainers spend 40% of their time triaging issues and testing broken fixes. RepoMedic compresses issue-to-verified-PR from hours of manual triage down to 1-3 minutes of automated sandbox verification.
 - **Zero Human Oversight Needed for Low-Risk Patches**: High verification confidence enables automated merging for clean bug fixes.
 - **Standardized GitHub App**: Zero client repository reconfiguration; install and trigger with `/repomedic fix`.
 

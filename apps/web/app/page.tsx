@@ -403,12 +403,12 @@ export default async function HomePage() {
               </div>
               <div>
                 <h3 className="font-semibold text-base">Eliminating Maintainer Burnout</h3>
-                <span className="text-xs text-muted-foreground">Hours of Triage Reduced to 60 Seconds</span>
+                <span className="text-xs text-muted-foreground">Hours of Triage Reduced to Minutes of Automated Execution</span>
               </div>
             </div>
             <ul className="text-sm text-muted-foreground space-y-2 list-disc list-inside">
               <li>
-                <strong className="text-foreground">Velocity Shift:</strong> Open-source maintainers spend 40% of their time triaging issues and reviewing broken PRs. RepoMedic reduces resolution time from hours to under 60 seconds.
+                <strong className="text-foreground">Velocity Shift:</strong> Open-source maintainers spend 40% of their time triaging issues and reviewing broken PRs. RepoMedic reduces resolution time from hours of manual triage down to 1-3 minutes of automated, test-verified execution.
               </li>
               <li>
                 <strong className="text-foreground">High-Confidence Automation:</strong> By enforcing strict sandbox verification, maintainers can safely enable automated merge for verified low-risk bug fixes.

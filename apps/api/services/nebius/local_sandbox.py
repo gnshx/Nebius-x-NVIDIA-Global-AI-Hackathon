@@ -26,6 +26,7 @@ import structlog
 
 from config import settings
 from .sandbox import SandboxResult, _truncate
+from services.snapshot_manager import SandboxSnapshotManager
 
 logger = structlog.get_logger(__name__)
 DOCKER_IMAGE = "python:3.12-slim"
@@ -111,6 +112,7 @@ class LocalSandboxExecutor:
         self._workdirs: dict[str, Path] = {}
         self._max_log_bytes: int = settings.nebius_sandbox_max_log_bytes
         self._has_docker: bool | None = None
+        self._snapshot_mgr = SandboxSnapshotManager()
 
     def _check_docker(self) -> bool:
         if self._has_docker is None:
@@ -118,7 +120,7 @@ class LocalSandboxExecutor:
         return self._has_docker
 
     async def create_sandbox(self, repo_tarball: bytes) -> str:
-        """Extract repo tarball or seed from demo directory."""
+        """Extract repo tarball or seed from demo directory with snapshot caching."""
         sandbox_id = str(uuid.uuid4())
         workdir = Path(tempfile.mkdtemp(prefix=f"repomedic-{sandbox_id[:8]}-"))
         self._workdirs[sandbox_id] = workdir
@@ -132,6 +134,15 @@ class LocalSandboxExecutor:
                 self._seed_demo_dir(workdir)
         else:
             self._seed_demo_dir(workdir)
+
+        # Baseline snapshot caching (SWE-bench 2026)
+        try:
+            fingerprint = self._snapshot_mgr.compute_dependency_fingerprint(workdir)
+            cache_key = self._snapshot_mgr.compute_cache_key("repo", fingerprint)
+            if not self._snapshot_mgr.has_snapshot(cache_key):
+                self._snapshot_mgr.save_snapshot(cache_key, workdir, fingerprint)
+        except Exception as e:
+            logger.debug("snapshot_cache_op_failed", error=str(e))
 
         logger.info("local_sandbox_created", sandbox_id=sandbox_id, workdir=str(workdir))
         return sandbox_id
