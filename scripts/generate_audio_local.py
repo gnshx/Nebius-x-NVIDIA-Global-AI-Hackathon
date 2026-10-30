@@ -41,8 +41,8 @@ PITCH_SCRIPT = (
     "and verified all two hundred and forty-one tests passing with zero regressions before dispatching the pull request. "
     "When third-party dependencies drift or APIs deprecate, RepoMedic selectively queries Tavily AI Search "
     "to pull official migration docs and self-heal automatically. "
-    "With a real-time Next.js observability portal, RepoMedic turns hours of maintainer triage into sixty seconds "
-    "of verified confidence. This is the future of autonomous agentic engineering on open infrastructure."
+    "With a real-time Next.js observability portal, RepoMedic turns hours of maintainer triage into minutes "
+    "of test-verified confidence. This is the future of autonomous agentic engineering on open infrastructure."
 )
 
 

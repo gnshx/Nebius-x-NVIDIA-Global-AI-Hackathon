@@ -68,3 +68,17 @@ def test_preflight_to_dict():
     assert "is_sandbox_ready" in d
     assert "risk_level" in d
     assert "clean_lines_ratio" in d
+
+
+def test_preflight_detects_undefined_symbols_when_content_provided():
+    files = [
+        {
+            "path": "src/mod.py",
+            "diff": "+    return nonexistent_var\n",
+            "content": "def calc():\n    return nonexistent_var\n",
+        }
+    ]
+    report = AdversarialPreflightAuditor.audit_patch(files)
+    assert report.is_sandbox_ready is True
+    assert any("Undefined symbol" in iss for iss in report.issues_detected)
+

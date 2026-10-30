@@ -19,6 +19,7 @@ from typing import Any, NamedTuple
 import structlog
 
 from services.syntax_guard import SyntaxIntegrityGuard
+from services.linter_validator import StaticLinterValidator
 
 logger = structlog.get_logger(__name__)
 
@@ -78,6 +79,13 @@ class AdversarialPreflightAuditor:
             syntax_check = SyntaxIntegrityGuard.verify_patch_hunks(diff)
             if not syntax_check.is_valid:
                 issues.append(f"[{path}] Syntax Integrity Defect: {syntax_check.details}")
+
+            # Check for undefined variables if full file content is provided (StaticLinterValidator)
+            content = f.get("content", "")
+            if content and path.endswith(".py"):
+                lint_report = StaticLinterValidator.validate_code(content)
+                if not lint_report.is_clean and lint_report.undefined_names:
+                    issues.append(f"[{path}] Undefined symbol(s) detected: {', '.join(lint_report.undefined_names[:3])}")
 
         clean_ratio = round(
             max(0.0, 1.0 - (debug_lines_count / max(1, total_added_lines))), 2

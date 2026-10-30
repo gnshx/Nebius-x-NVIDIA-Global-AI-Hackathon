@@ -27,6 +27,7 @@ import structlog
 from config import settings
 from .sandbox import SandboxResult, _truncate
 from services.snapshot_manager import SandboxSnapshotManager
+from services.checkpoint_manager import WorkspaceCheckpointManager
 
 logger = structlog.get_logger(__name__)
 DOCKER_IMAGE = "python:3.12-slim"
@@ -113,6 +114,7 @@ class LocalSandboxExecutor:
         self._max_log_bytes: int = settings.nebius_sandbox_max_log_bytes
         self._has_docker: bool | None = None
         self._snapshot_mgr = SandboxSnapshotManager()
+        self._checkpoint_mgr = WorkspaceCheckpointManager()
 
     def _check_docker(self) -> bool:
         if self._has_docker is None:
@@ -141,11 +143,28 @@ class LocalSandboxExecutor:
             cache_key = self._snapshot_mgr.compute_cache_key("repo", fingerprint)
             if not self._snapshot_mgr.has_snapshot(cache_key):
                 self._snapshot_mgr.save_snapshot(cache_key, workdir, fingerprint)
+            # Create instantaneous checkpoint for rollback/backtracking (SWE-Search)
+            self._checkpoint_mgr.create_checkpoint(workdir, "baseline")
         except Exception as e:
             logger.debug("snapshot_cache_op_failed", error=str(e))
 
         logger.info("local_sandbox_created", sandbox_id=sandbox_id, workdir=str(workdir))
         return sandbox_id
+
+    def checkpoint(self, sandbox_id: str, name: str = "baseline") -> bool:
+        """Capture workspace state snapshot."""
+        workdir = self._workdirs.get(sandbox_id)
+        if not workdir:
+            return False
+        self._checkpoint_mgr.create_checkpoint(workdir, name)
+        return True
+
+    def rollback(self, sandbox_id: str, name: str = "baseline") -> bool:
+        """Rollback workspace state cleanly to previously captured checkpoint."""
+        workdir = self._workdirs.get(sandbox_id)
+        if not workdir:
+            return False
+        return self._checkpoint_mgr.restore_checkpoint(workdir, name)
 
     def _seed_demo_dir(self, workdir: Path) -> None:
         """Seed workdir with demo repository files if available."""
