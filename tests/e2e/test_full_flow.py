@@ -14,7 +14,7 @@ import asyncio
 import uuid
 
 import pytest
-import pytest_asyncio
+pytest_asyncio = pytest.importorskip("pytest_asyncio")
 
 # This test requires a running postgres and redis (via Docker Compose)
 # Mark as integration test requiring external services

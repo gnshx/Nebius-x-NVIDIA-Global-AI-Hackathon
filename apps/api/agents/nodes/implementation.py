@@ -171,6 +171,18 @@ async def run(state: RepoMedicState) -> dict:
     from services.draft_conditioned_decoder import DraftConditionedDecoder
     decoded_block = DraftConditionedDecoder.decode_and_condition(diff_text)
 
+    # Deterministic Patch Canonicalization (CanonicalPatch, FSE 2026)
+    from services.patch_canonicalizer import DeterministicPatchCanonicalizer
+    for f in patch_dict.get("files", []):
+        if f.get("patch"):
+            canon_res = DeterministicPatchCanonicalizer.canonicalize(f["patch"])
+            if canon_res.has_modifications:
+                f["patch"] = canon_res.canonical_diff
+
+    # Differential Resource Finalization & Leak Auditing (Amur, ASE 2025 / ICSE 2026)
+    from services.resource_finalization_auditor import DifferentialResourceFinalizationAuditor
+    resource_report = DifferentialResourceFinalizationAuditor.audit_code(diff_text)
+
     # Multi-file topological scheduling (Multi-SWE-bench 2025/2026)
     from services.topological_patch_scheduler import TopologicalPatchScheduler
     topological_schedule = TopologicalPatchScheduler.schedule_patch_files(patch_dict.get("files", []))
@@ -190,6 +202,7 @@ async def run(state: RepoMedicState) -> dict:
         preflight_risk=preflight_report.risk_level,
         type_safety_score=type_report.type_safety_score,
         ast_valid=decoded_block.is_ast_valid,
+        resource_safety_score=resource_report.safety_score,
         multi_file_scheduled=topological_schedule.is_multi_file_patch,
         summary=patch.summary[:120],
     )
@@ -201,6 +214,7 @@ async def run(state: RepoMedicState) -> dict:
         "preflight_audit": preflight_report.to_dict(),
         "type_constraint_audit": type_report.to_dict(),
         "dccd_audit": decoded_block.to_dict(),
+        "resource_finalization_audit": resource_report.to_dict(),
         "topological_schedule": topological_schedule.to_dict(),
         "reranking": rerank_result.to_dict(),
     }
