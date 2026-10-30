@@ -18,6 +18,8 @@ import re
 from typing import Any, NamedTuple
 import structlog
 
+from services.syntax_guard import SyntaxIntegrityGuard
+
 logger = structlog.get_logger(__name__)
 
 
@@ -72,11 +74,19 @@ class AdversarialPreflightAuditor:
                     issues.append(f"[{path}] {msg} ({len(matches)} occurrence(s))")
                     debug_lines_count += len(matches)
 
+            # Check grammar and bracket integrity (SyntaxIntegrityGuard)
+            syntax_check = SyntaxIntegrityGuard.verify_patch_hunks(diff)
+            if not syntax_check.is_valid:
+                issues.append(f"[{path}] Syntax Integrity Defect: {syntax_check.details}")
+
         clean_ratio = round(
             max(0.0, 1.0 - (debug_lines_count / max(1, total_added_lines))), 2
         )
 
-        has_high_risk = any("breakpoint" in iss or "pdb" in iss for iss in issues)
+        has_high_risk = any(
+            "breakpoint" in iss or "pdb" in iss or "Syntax Integrity" in iss
+            for iss in issues
+        )
 
         if has_high_risk:
             risk = "HIGH"
