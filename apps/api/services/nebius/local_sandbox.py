@@ -28,6 +28,7 @@ from config import settings
 from .sandbox import SandboxResult, _truncate
 from services.snapshot_manager import SandboxSnapshotManager
 from services.checkpoint_manager import WorkspaceCheckpointManager
+from services.sandbox_layered_overlay import SandboxLayeredOverlayManager, OverlaySession
 
 logger = structlog.get_logger(__name__)
 DOCKER_IMAGE = "python:3.12-slim"
@@ -115,6 +116,7 @@ class LocalSandboxExecutor:
         self._has_docker: bool | None = None
         self._snapshot_mgr = SandboxSnapshotManager()
         self._checkpoint_mgr = WorkspaceCheckpointManager()
+        self._overlay_mgr = SandboxLayeredOverlayManager()
 
     def _check_docker(self) -> bool:
         if self._has_docker is None:
@@ -165,6 +167,13 @@ class LocalSandboxExecutor:
         if not workdir:
             return False
         return self._checkpoint_mgr.restore_checkpoint(workdir, name)
+
+    def create_overlay(self, sandbox_id: str) -> Optional[OverlaySession]:
+        """Provisions an isolated CoW ephemeral overlay for fast candidate test execution."""
+        workdir = self._workdirs.get(sandbox_id)
+        if not workdir:
+            return None
+        return self._overlay_mgr.create_overlay_session(base_dir=workdir)
 
     def _seed_demo_dir(self, workdir: Path) -> None:
         """Seed workdir with demo repository files if available."""

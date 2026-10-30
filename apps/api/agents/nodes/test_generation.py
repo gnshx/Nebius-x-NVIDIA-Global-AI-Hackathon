@@ -21,6 +21,7 @@ from services.nebius.client import Message, model_provider
 from services.mutation_tester import MutationTester
 from services.boundary_prober import BoundaryProber
 from services.joint_validation_auditor import JointValidationAuditor
+from services.variant_guided_discriminator import VariantGuidedDiscriminator
 
 logger = structlog.get_logger(__name__)
 
@@ -149,10 +150,21 @@ async def run(state: RepoMedicState) -> dict:
         has_tautologies=not test_quality_report.is_robust_oracle,
     )
 
+    # Program-variant guided test discrimination (PROBE, ASE 2026)
+    impl_diff_combined = "\n".join(
+        f.get("diff", "") for f in current_patch.get("files", [])
+        if "test" not in f.get("path", "").lower()
+    )
+    variant_report = VariantGuidedDiscriminator.evaluate_test_discrimination(
+        patch_diff=impl_diff_combined,
+        test_diff=test_diff_combined,
+    )
+
     return {
         "current_patch": merged_patch,
         "generated_tests": [fc.model_dump() for fc in test_patch.files],
         "test_quality": test_quality_report.to_dict(),
         "boundary_probing": boundary_probing.to_dict(),
         "jvr_report": jvr_report.to_dict(),
+        "variant_discrimination": variant_report.to_dict(),
     }
