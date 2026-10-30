@@ -34,64 +34,64 @@ const CHAPTERS: Chapter[] = [
     badgeColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
   },
   {
-    timestamp: "0:24",
-    seconds: 24,
+    timestamp: "0:20",
+    seconds: 20,
     title: "Real Bug: python-humanize #466",
     description: "Authentic maintainer bug on 2,500+ ★ repo: intcomma() crashes on negative ndigits.",
     badge: "Real Open Source",
     badgeColor: "text-red-400 bg-red-500/10 border-red-500/20"
   },
   {
-    timestamp: "0:42",
-    seconds: 42,
+    timestamp: "0:36",
+    seconds: 36,
     title: "Step 1: AST Fault Localization",
     description: "Tree-sitter AST parsing isolates 1,420 token slice, eliminating context dilution.",
     badge: "WHAT / HOW / WHY / BEST",
     badgeColor: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20"
   },
   {
-    timestamp: "1:00",
-    seconds: 60,
+    timestamp: "0:51",
+    seconds: 51,
     title: "Step 2: Nemotron 30B MoE Reasoning",
     description: "NVIDIA NIM API activates 3.5B params/token with sub-second streaming chain-of-thought.",
     badge: "NVIDIA NIM",
     badgeColor: "text-purple-400 bg-purple-500/10 border-purple-500/20"
   },
   {
-    timestamp: "1:20",
-    seconds: 80,
+    timestamp: "1:07",
+    seconds: 67,
     title: "Step 3: Contract Fuzzing & Diffs",
     description: "Dynamic parameter boundary fuzzing across None, boundary numerics, and negative values.",
     badge: "SWE-Fuzz 2026",
     badgeColor: "text-amber-400 bg-amber-500/10 border-amber-500/20"
   },
   {
-    timestamp: "1:38",
-    seconds: 98,
+    timestamp: "1:22",
+    seconds: 82,
     title: "Step 4: Hermetic Sandbox Pytest",
     description: "241 / 241 unit tests pass in isolated Docker sandbox with multi-seed test shuffling.",
     badge: "100% Pass Proof",
     badgeColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
   },
   {
-    timestamp: "1:58",
-    seconds: 118,
+    timestamp: "1:39",
+    seconds: 99,
     title: "Step 5: Live Pull Request #467",
     description: "PatchValidator security check and authenticated dispatch to GitHub repository.",
     badge: "Live GitHub PR",
     badgeColor: "text-blue-400 bg-blue-500/10 border-blue-500/20"
   },
   {
-    timestamp: "2:14",
-    seconds: 134,
+    timestamp: "1:52",
+    seconds: 112,
     title: "Live Observability & 3D WebGL",
     description: "Real-time Next.js portal with Three.js state machine visualizer and SSE telemetry.",
     badge: "Next.js + Three.js",
     badgeColor: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20"
   },
   {
-    timestamp: "2:42",
-    seconds: 162,
+    timestamp: "2:10",
+    seconds: 130,
     title: "Conclusion & Open Infrastructure",
     description: "Turning hours of maintainer triage into 2 minutes of test-verified code.",
     badge: "Enterprise Impact",
@@ -127,7 +127,7 @@ export function DemoVideoPlayer() {
             </span>
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-800 text-zinc-300">
               <Clock className="h-3 w-3 text-zinc-400" />
-              2m 50s (1080p 30fps)
+              2m 24s (1080p 30fps)
             </span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">

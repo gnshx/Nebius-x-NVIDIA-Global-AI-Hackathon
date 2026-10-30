@@ -8,7 +8,7 @@
 - **Elevator Pitch / Tagline:** Zero-hallucination autonomous program repair agent powered by NVIDIA Nemotron 30B MoE via NVIDIA NIM & hermetic container execution. Diagnoses bugs, generates AST-causal fixes, and verifies 100% test passing before opening PRs.
 - **Submission Track:** Coding & Agentic Engineering (Nebius & NVIDIA Track)
 - **Repository URL:** [https://github.com/gnshx/Nebius-x-NVIDIA-Global-AI-Hackathon](https://github.com/gnshx/Nebius-x-NVIDIA-Global-AI-Hackathon)
-- **Demo Video:** `assets/repomedic_demo.mp4` (1080p Full HD, 2m 50s, 5.43 MB)
+- **Demo Video:** `assets/repomedic_demo.mp4` (1080p Full HD, 2m 24s, 4.12 MB)
 - **Real-World PR Proof:** [python-humanize/humanize #467](https://github.com/python-humanize/humanize/pull/467)
 - **Real-World Bug Issue:** [python-humanize/humanize #466](https://github.com/python-humanize/humanize/issues/466)
 
@@ -69,7 +69,7 @@ We proved RepoMedic on [`python-humanize/humanize`](https://github.com/python-hu
 
 1. **Flaky Test Cascades in Real Repositories:** Real-world test suites often pass or fail based on test execution order. We implemented the *DeepSWE Multi-Seed Shuffler* (`flakiness_seed_shuffler.py`), executing test orders under alternating pseudo-random seeds to catch false passes.
 2. **Context Dilution in Large Repositories:** Dumping whole files into LLM prompts causes attention drift. By building a Tree-sitter Causal Program Slicer (`bidirectional_program_slicer.py`), we reduced prompt token overhead from ~50,000 tokens to 1,420 tokens.
-3. **Strict 3-Minute Video Constraint:** Balancing deep architectural explanation with real open-source proof in under 180 seconds required strict millisecond pacing. We built an automated FFmpeg compilation pipeline synchronizing 12 visual frames with neural audio, landing at exactly **170.50 seconds (2m 50.5s)**.
+3. **Strict 3-Minute Video Constraint:** Balancing deep architectural explanation with real open-source proof in under 180 seconds required calibrated pacing and enunciation. We built an automated FFmpeg compilation pipeline synchronizing 12 visual frames with natural neural audio, landing at exactly **144.34 seconds (2m 24s)**.
 
 ---
 

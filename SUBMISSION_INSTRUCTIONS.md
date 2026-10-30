@@ -20,7 +20,7 @@ Follow these steps to submit RepoMedic to the **Nebius x NVIDIA Global AI Hackat
 
 - **Video Demo URL:**  
   Upload `repomedic/assets/repomedic_demo.mp4` to YouTube (Unlisted or Public) or Loom/Vimeo, and paste the URL in Devpost.  
-  *(The video file is located at `repomedic/assets/repomedic_demo.mp4`, 1920x1080 Full HD, 170.5s duration, 5.43 MB).*
+  *(The video file is located at `repomedic/assets/repomedic_demo.mp4`, 1920x1080 Full HD, 144.3s duration, 4.12 MB).*
 
 - **Story & Description:**  
   Copy the full markdown from `repomedic/DEVPOST_SUBMISSION.md` directly into the "About the Project" text area.
@@ -44,5 +44,5 @@ Follow these steps to submit RepoMedic to the **Nebius x NVIDIA Global AI Hackat
 - ✅ **Pytest:** 256 / 256 unit tests passed in 0.81s (`pytest`).
 - ✅ **Truthfulness Audit:** 0 violations detected (`python3 scripts/verify_truthfulness.py`).
 - ✅ **Frontend Build:** 100% successful compilation with 0 lint or type errors (`npm run build`).
-- ✅ **Demo Video:** 170.50s (under 3-minute hard limit), 1080p Full HD, AAC 192k audio.
+- ✅ **Demo Video:** 144.34s (under 3-minute hard limit), 1080p Full HD, AAC 192k audio.
 - ✅ **Git Status:** Clean tree, fully synced with `origin/main` on GitHub.

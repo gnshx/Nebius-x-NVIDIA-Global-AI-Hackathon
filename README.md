@@ -29,7 +29,7 @@
 ## 🎬 Submission Video Walkthrough
 
 > **[▶ Download & Watch 1080p Demo Video (assets/repomedic_demo.mp4)](assets/repomedic_demo.mp4)**  
-> *Duration: 2 minutes 50.5 seconds (170.5s) • Resolution: 1920×1080 @ 30fps Full HD • Audio: Local Neural TTS*
+> *Duration: 2 minutes 24.3 seconds (144.3s) • Resolution: 1920×1080 @ 30fps Full HD • Audio: Local Neural TTS • Size: 4.12 MB*
 
 The demo video showcases RepoMedic in action, featuring:
 - **The Closed-Loop Paradigm:** Zero-Hallucination Policy (PRs strictly blocked unless 100% of unit tests pass in isolated sandboxes).
