@@ -33,8 +33,10 @@ from services.order_independence_checker import OrderIndependenceChecker
 from services.regression_invariant_prober import RegressionInvariantProber
 from services.flakiness_seed_shuffler import FlakinessSeedShuffler
 from services.contract_fuzzer import DynamicContractFuzzer
+from services.memory_leak_guard import MemoryLeakGuard
 
 logger = structlog.get_logger(__name__)
+
 
 
 _MAX_DIFF_CHARS = 8_000
@@ -143,6 +145,9 @@ async def run(state: RepoMedicState) -> dict:
     # Dynamic Contract Fuzzing & Boundary Auditor (SWE-Fuzz 2026)
     contract_fuzz_report = DynamicContractFuzzer.audit_code(source_files_content or diff_str)
 
+    # Differential Memory & Heap Allocation Hazard Guard (MemCheck-APR 2026)
+    memory_report = MemoryLeakGuard.audit_code(diff_str)
+
     messages = [
         Message(
             role="user",
@@ -196,6 +201,11 @@ async def run(state: RepoMedicState) -> dict:
                 f"Robustness Score: {contract_fuzz_report.overall_robustness_score * 100:.1f}%\n"
                 f"Fuzz Cases Checked: {contract_fuzz_report.total_fuzz_cases}\n"
                 f"Unhandled Edge Risks: {len(contract_fuzz_report.unhandled_edge_risks)}\n\n"
+                "## Differential Memory & Heap Audit (MemCheck-APR 2026)\n"
+                f"Memory Safe: {memory_report.is_memory_safe}\n"
+                f"Safety Score: {memory_report.safety_score * 100:.1f}%\n"
+                f"Hazards Detected: {len(memory_report.hazards_detected)}\n"
+                f"Recommendation: {memory_report.recommendation}\n\n"
                 "## Regression Invariant Probing (SWE-bench Atlas ICLR 2026)\n"
                 f"Invariants Preserved: {invariant_report.invariants_preserved}\n"
                 f"Invariant Score: {invariant_report.invariant_score * 100:.1f}%\n"
@@ -244,7 +254,9 @@ async def run(state: RepoMedicState) -> dict:
         "invariant_report": invariant_report.to_dict(),
         "flakiness_report": flakiness_report.to_dict(),
         "contract_fuzz_report": contract_fuzz_report.to_dict(),
+        "memory_leak_audit": memory_report.to_dict(),
     }
+
 
 
 
