@@ -160,6 +160,18 @@ async def run(state: RepoMedicState) -> dict:
     diff_text = "\n".join(fc.get("patch", "") for fc in patch_dict.get("files", []))
     type_report = AdaptiveTypeConstraintVerifier.verify_response(diff_text)
 
+    # Draft-conditioned constrained decoding audit (DCCD, ICML 2026)
+    from services.draft_conditioned_decoder import DraftConditionedDecoder
+    decoded_block = DraftConditionedDecoder.decode_and_condition(diff_text)
+
+    # Multi-file topological scheduling (Multi-SWE-bench 2025/2026)
+    from services.topological_patch_scheduler import TopologicalPatchScheduler
+    topological_schedule = TopologicalPatchScheduler.schedule_patch_files(patch_dict.get("files", []))
+    if topological_schedule.is_multi_file_patch:
+        ordered_paths = [f.path for f in topological_schedule.ordered_files]
+        file_map = {f.get("path"): f for f in patch_dict.get("files", [])}
+        patch_dict["files"] = [file_map[p] for p in ordered_paths if p in file_map]
+
     # Test-time multi-candidate reranking evaluation (Agentless / SWE-Reasoner 2026)
     rerank_result = MultiCandidateReranker.rerank([patch_dict])
 
@@ -170,6 +182,8 @@ async def run(state: RepoMedicState) -> dict:
         invariant_score=cross_val_report.invariant_score,
         preflight_risk=preflight_report.risk_level,
         type_safety_score=type_report.type_safety_score,
+        ast_valid=decoded_block.is_ast_valid,
+        multi_file_scheduled=topological_schedule.is_multi_file_patch,
         summary=patch.summary[:120],
     )
 
@@ -179,5 +193,7 @@ async def run(state: RepoMedicState) -> dict:
         "cross_validation": cross_val_report.to_dict(),
         "preflight_audit": preflight_report.to_dict(),
         "type_constraint_audit": type_report.to_dict(),
+        "dccd_audit": decoded_block.to_dict(),
+        "topological_schedule": topological_schedule.to_dict(),
         "reranking": rerank_result.to_dict(),
     }
