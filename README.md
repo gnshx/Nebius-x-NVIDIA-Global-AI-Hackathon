@@ -50,14 +50,17 @@ The submission video walks through the complete end-to-end engineering cycle:
 
 Rather than evaluating exclusively on synthetic mock files or static toy benchmarks, RepoMedic was proven in production against **[`python-humanize/humanize`](https://github.com/python-humanize/humanize)**, an active open-source project with **2,500+ GitHub stars**:
 
-```
-                                  REPOMEDIC AUTONOMOUS REPAIR LIFECYCLE
-                                  
-  GitHub Issue #466               Tree-sitter AST Slicing         Nemotron 30B MoE (NIM)         Docker Sandbox Pytest         Verified Pull Request #467
-┌────────────────────┐          ┌─────────────────────────┐     ┌───────────────────────┐      ┌─────────────────────────┐    ┌───────────────────────────┐
-│ ValueError: Format │ ───────→ │ Isolates caller-callee  │ ──→ │ Synthesizes defensive │ ───→ │ 241/241 passed in 0.20s │ ─→ │ Merged-ready PR submitted │
-│ specifier missing  │          │ subgraph (1,420 tokens) │     │ AST patch + test case │      │ Zero regressions verified│   │ with full audit proofs    │
-└────────────────────┘          └─────────────────────────┘     └───────────────────────┘      └─────────────────────────┘    └───────────────────────────┘
+```mermaid
+graph LR
+    A["GitHub Issue #466<br/>ValueError: Format specifier"] --> B["Tree-sitter AST Slicing<br/>1,420 tokens extracted"]
+    B --> C["NVIDIA Nemotron 30B MoE<br/>NVIDIA NIM CoT reasoning"]
+    C --> D["Hermetic Docker Sandbox<br/>241/241 tests pass in 0.20s"]
+    D --> E["Verified GitHub PR #467<br/>Merged-ready with full proof"]
+    style A fill:#1e293b,stroke:#ef4444,stroke-width:2px,color:#f8fafc
+    style B fill:#1e293b,stroke:#06b6d4,stroke-width:2px,color:#f8fafc
+    style C fill:#1e293b,stroke:#a855f7,stroke-width:2px,color:#f8fafc
+    style D fill:#1e293b,stroke:#10b981,stroke-width:2px,color:#f8fafc
+    style E fill:#1e293b,stroke:#10b981,stroke-width:2px,color:#f8fafc
 ```
 
 - **Target Repository:** [`python-humanize/humanize`](https://github.com/python-humanize/humanize) (2,500+ ★)
@@ -82,26 +85,18 @@ RepoMedic eliminates the fundamental flaw of LLM coding agents by replacing open
 
 ---
 
-## 🛠️ The Complete Approach & Engineering Stack
+## 🛠️ Closed-Loop System Architecture
 
-RepoMedic is built on a modular, enterprise-grade distributed architecture combining high-throughput inference, hermetic container sandboxing, AST semantic slicing, and full-stack observability.
+<div align="center">
+  <img src="assets/architecture.jpg" alt="RepoMedic Closed-Loop Autonomous Program Repair Architecture" width="100%" style="border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.5); margin: 20px 0;" />
+</div>
 
-```
-┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                    REPOMEDIC ARCHITECTURE STACK                                  │
-├──────────────────────────┬───────────────────────────────────────────────────────────────────────┤
-│ 1. Compute & Cloud Tier  │ Nebius AI Cloud Infrastructure · NVIDIA NIM API Gateway               │
-│ 2. Intelligence Tier     │ NVIDIA Nemotron 3.5 Lightning (30B MoE, ~3.5B active/token)          │
-│ 3. AST & Slicing Tier    │ Tree-sitter Polyglot Parser · Causal Program Slicer (def-use chains)   │
-│ 4. Orchestration Tier    │ LangGraph 0.2 Cyclic State Machine · Celery Distributed Workers       │
-│ 5. Hermetic Sandbox Tier │ Docker Containers · Layered CoW Overlays · Zero Network Egress        │
-│ 6. Defensive Quality Tier│ DeepSWE Shuffler · SWE-Fuzz Contract Fuzzer · MemoryLeakGuard         │
-│ 7. Persistence Tier      │ PostgreSQL 16 · pgvector Semantic Indexing · Redis Pub/Sub             │
-│ 8. API & Ingestion Tier  │ FastAPI 0.111 · HMAC GitHub Webhook Verification · Server-Sent Events │
-│ 9. Observability & Web   │ Next.js 14 App Router · Three.js 60 FPS 3D WebGL · Tailwind CSS       │
-│ 10. Web Drift Tier       │ Tavily AI Search (Selective live documentation & API drift recovery)   │
-└──────────────────────────┴───────────────────────────────────────────────────────────────────────┘
-```
+The architecture diagram above illustrates RepoMedic's complete 5-stage closed-loop execution flow:
+1. **Ingestion & AST Slicing:** Extracts reproduction signatures from GitHub issues and utilizes Tree-sitter to slice def-use dependency subgraphs, compressing prompt context from 50k tokens to 1,420 tokens.
+2. **NVIDIA NIM Intelligence:** Queries **NVIDIA Nemotron 3.5 Lightning (30B MoE)** via the **NVIDIA NIM API**, activating ~3.5B parameters per token for streaming Chain-of-Thought (CoT) hypothesis and patch synthesis.
+3. **Hermetic Docker Sandbox:** Deploys an isolated container with Copy-on-Write overlays and zero network egress (`--network none`) to execute the full test battery.
+4. **Verification & Fuzzing Gates:** Subjects candidate patches to the **DeepSWE Multi-Seed Shuffler** and **Dynamic Contract Fuzzer**, enforcing the **Zero-Hallucination Policy (100% pass required)**.
+5. **Production Dispatch & Observability:** Automatically authenticates via GitHub App to submit verified Pull Requests, streaming live telemetry to the **Next.js 14** portal and **60 FPS Three.js 3D WebGL** state machine.
 
 ### 1. Compute & Intelligence Tier (NVIDIA & Nebius)
 - **NVIDIA Nemotron 3.5 Lightning (30B MoE):** High-throughput reasoning model deployed via **NVIDIA NIM API** (`integrate.api.nvidia.com`). Its Mixture-of-Experts architecture activates only ~3.5B parameters per token, delivering sub-second step latencies essential for multi-turn repair loops.
@@ -158,34 +153,40 @@ RepoMedic integrates 15 state-of-the-art automated program repair (APR) techniqu
 
 The LangGraph orchestration state machine enforces strict typed transitions across 12 specialized nodes:
 
-```
-                                      THE 12-NODE STATE MACHINE
-                                      
-  [1. Issue Analysis] ──→ [2. Repo Analysis] ──→ [3. Code Retrieval] ──→ [4. Planning] ──→ [5. Implementation]
-                                                                                                  │
-                                                                                        [6. Test Generation]
-                                                                                                  │
-                                                                                       [7. Sandbox Execution]
-                                                                                                  │
-       ┌───────────────────────────────────────┴──────────────────────────────────────────────────┐
-       │                                                                                          │
-     [PASS]                                                                                     [FAIL]
-       │                                                                                          │
-  [11. Verification Gate]                                                                [8. Failure Analysis]
-       │                                                                                          │
-  [12. PR Generation]                                                              ┌──────────────┴──────────────┐
-       │                                                                           │ Requires Research?          │
-    GitHub PR ✅                                                                   ├── Yes ──→ [9. Web Research]  │
-                                                                                   │                  │          │
-                                                                                   └── No ────────────┴──────────┤
-                                                                                                                 │
-                                                                                                       [10. Patch Revision]
-                                                                                                                 │
-                                                                                                        [7. Sandbox Execution] (Retry)
-                                                                                                                 │
-                                                                                                         Max 3 Iterations
-                                                                                                                 │
-                                                                                                         Run Terminated ❌
+```mermaid
+flowchart TD
+    N1["1. Issue Analysis"] --> N2["2. Repo Analysis"]
+    N2 --> N3["3. Code Retrieval (AST Slicing)"]
+    N3 --> N4["4. Planning (Nemotron 30B MoE)"]
+    N4 --> N5["5. Implementation (PatchValidator)"]
+    N5 --> N6["6. Test Generation (Oracle)"]
+    N6 --> N7["7. Sandbox Execution (Docker)"]
+    
+    N7 -->|PASS: 100% Tests| N11["11. Verification Gate"]
+    N11 --> N12["12. PR Generation"]
+    N12 --> PR["GitHub Pull Request ✅"]
+    
+    N7 -->|FAIL: Regressions| N8["8. Failure Analysis"]
+    N8 -->|Needs Web Docs| N9["9. Web Research (Tavily)"]
+    N8 -->|Local Fix| N10["10. Patch Revision"]
+    N9 --> N10
+    N10 -->|Retry: Max 3x| N7
+    N10 -->|Max Retries Exceeded| FAIL["Run Terminated ❌"]
+
+    style N1 fill:#1e293b,stroke:#06b6d4,stroke-width:1.5px,color:#f8fafc
+    style N2 fill:#1e293b,stroke:#06b6d4,stroke-width:1.5px,color:#f8fafc
+    style N3 fill:#1e293b,stroke:#06b6d4,stroke-width:1.5px,color:#f8fafc
+    style N4 fill:#1e293b,stroke:#a855f7,stroke-width:1.5px,color:#f8fafc
+    style N5 fill:#1e293b,stroke:#a855f7,stroke-width:1.5px,color:#f8fafc
+    style N6 fill:#1e293b,stroke:#06b6d4,stroke-width:1.5px,color:#f8fafc
+    style N7 fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#f8fafc
+    style N11 fill:#1e293b,stroke:#10b981,stroke-width:2px,color:#f8fafc
+    style N12 fill:#1e293b,stroke:#10b981,stroke-width:2px,color:#f8fafc
+    style PR fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ecfdf5
+    style N8 fill:#1e293b,stroke:#f59e0b,stroke-width:1.5px,color:#f8fafc
+    style N9 fill:#1e293b,stroke:#f59e0b,stroke-width:1.5px,color:#f8fafc
+    style N10 fill:#1e293b,stroke:#a855f7,stroke-width:1.5px,color:#f8fafc
+    style FAIL fill:#7f1d1d,stroke:#ef4444,stroke-width:2px,color:#fef2f2
 ```
 
 | Node # | Node Identifier | Subsystem | Responsibility | Deterministic Guard |
