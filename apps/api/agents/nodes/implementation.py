@@ -21,6 +21,7 @@ from services.patch_minimizer import PatchMinimizer
 from services.cross_validator import PatchCrossValidator
 from services.candidate_reranker import MultiCandidateReranker
 from services.preflight_auditor import AdversarialPreflightAuditor
+from services.bidirectional_program_slicer import BiDirectionalProgramSlicer
 
 logger = structlog.get_logger(__name__)
 
@@ -68,12 +69,18 @@ _validator = PatchValidator()
 
 
 def _chunk_context(chunks: list[dict], top_n: int = _TOP_CHUNKS) -> str:
+    """Renders retrieved code chunks using causal program slicing (CausalRepair 2026)."""
     parts: list[str] = []
     for chunk in chunks[:top_n]:
         path = chunk.get("path", "unknown")
         content = chunk.get("content", "")
         if len(content) > _MAX_CHUNK_CHARS:
-            content = content[:_MAX_CHUNK_CHARS] + "\n... [truncated]"
+            target_ln = chunk.get("start_line", 1) + 10
+            sliced = BiDirectionalProgramSlicer.slice(content, target_line=target_ln, context_radius=15)
+            if sliced.sliced_code and len(sliced.sliced_code) < len(content):
+                content = sliced.sliced_code
+            else:
+                content = content[:_MAX_CHUNK_CHARS] + "\n... [truncated]"
         parts.append(f"### {path}\n```\n{content}\n```")
     return "\n\n".join(parts)
 

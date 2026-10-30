@@ -22,6 +22,7 @@ from services.mutation_tester import MutationTester
 from services.boundary_prober import BoundaryProber
 from services.joint_validation_auditor import JointValidationAuditor
 from services.variant_guided_discriminator import VariantGuidedDiscriminator
+from services.dynamic_mock_synthesizer import DynamicMockSynthesizer
 
 logger = structlog.get_logger(__name__)
 
@@ -160,6 +161,12 @@ async def run(state: RepoMedicState) -> dict:
         test_diff=test_diff_combined,
     )
 
+    # Hermetic sandbox mock contract synthesis (ICSE 2026)
+    hermetic_report = DynamicMockSynthesizer.audit_and_synthesize(
+        source_code=impl_diff_combined,
+        test_code=test_diff_combined,
+    )
+
     return {
         "current_patch": merged_patch,
         "generated_tests": [fc.model_dump() for fc in test_patch.files],
@@ -167,4 +174,5 @@ async def run(state: RepoMedicState) -> dict:
         "boundary_probing": boundary_probing.to_dict(),
         "jvr_report": jvr_report.to_dict(),
         "variant_discrimination": variant_report.to_dict(),
+        "hermetic_isolation": hermetic_report.to_dict(),
     }
