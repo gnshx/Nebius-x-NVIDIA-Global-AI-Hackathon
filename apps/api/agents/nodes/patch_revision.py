@@ -19,6 +19,8 @@ from models.enums import StepType
 from models.schemas import Patch
 from services.nebius.client import Message, model_provider
 from services.patch_minimizer import PatchMinimizer
+from services.log_pruner import RuntimeLogPruner
+from services.cross_validator import PatchCrossValidator
 
 logger = structlog.get_logger(__name__)
 
@@ -64,7 +66,12 @@ async def run(state: RepoMedicState) -> dict:
 
     patch_summary = _format_patch(current_patch)
     research_text = _format_research(research_results)
-    failure_summary = test_result.get("failure_summary", "") or ""
+    # Isolate failure diagnostics using RuntimeLogPruner (SWE-Pruner)
+    log_pruning = RuntimeLogPruner.prune_pytest_output(
+        test_result.get("stdout", ""), test_result.get("stderr", ""), max_chars=3000
+    )
+    pruned_failure = log_pruning.pruned_text or test_result.get("failure_summary", "") or ""
+
     failing_tests_text = "\n".join(
         f"  - {t.get('name', '?')}: {t.get('error_type', '?')} — {t.get('message', '')}"
         for t in test_result.get("failing_tests", [])[:10]
@@ -90,8 +97,8 @@ async def run(state: RepoMedicState) -> dict:
                 f"Suggested fix: {failure_analysis.get('suggested_fix', '')}\n\n"
                 "## Failing Tests\n"
                 f"{failing_tests_text}\n\n"
-                "## Failure Output (last 30 lines)\n"
-                f"{failure_summary}\n\n"
+                "## Pruned Diagnostic Failure Logs (SWE-Pruner)\n"
+                f"{pruned_failure}\n\n"
                 "## Web Research\n"
                 f"{research_text}\n\n"
                 "## Original Plan Root Cause\n"
@@ -126,14 +133,20 @@ async def run(state: RepoMedicState) -> dict:
     revised_dict = revised_patch.model_dump()
     patch_history.append(revised_dict)
 
+    # Invariant cross-validation (TEX 2026)
+    cross_val_report = PatchCrossValidator.validate_patch(revised_dict.get("files", []))
+
     logger.info(
         "patch_revision_complete",
         run_id=run_id,
         files_revised=len(revised_patch.files),
+        invariant_score=cross_val_report.invariant_score,
         summary=revised_patch.summary[:120],
     )
 
     return {
         "current_patch": revised_dict,
         "patch_history": patch_history,
+        "cross_validation": cross_val_report.to_dict(),
+        "log_pruning": log_pruning.to_dict(),
     }

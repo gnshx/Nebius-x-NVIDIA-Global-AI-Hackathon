@@ -18,6 +18,7 @@ from models.enums import StepType
 from models.schemas import Patch
 from services.nebius.client import Message, model_provider
 from services.patch_minimizer import PatchMinimizer
+from services.cross_validator import PatchCrossValidator
 
 logger = structlog.get_logger(__name__)
 
@@ -146,14 +147,19 @@ async def run(state: RepoMedicState) -> dict:
     patch_dict = patch.model_dump()
     patch_history.append(patch_dict)
 
+    # Cross-validate patch against behavioral invariants (TEX 2026)
+    cross_val_report = PatchCrossValidator.validate_patch(patch_dict.get("files", []))
+
     logger.info(
         "implementation_complete",
         run_id=run_id,
         files_changed=len(patch.files),
+        invariant_score=cross_val_report.invariant_score,
         summary=patch.summary[:120],
     )
 
     return {
         "current_patch": patch_dict,
         "patch_history": patch_history,
+        "cross_validation": cross_val_report.to_dict(),
     }

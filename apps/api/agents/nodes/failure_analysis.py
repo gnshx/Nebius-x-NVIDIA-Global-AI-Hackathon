@@ -24,6 +24,7 @@ from agents.state import RepoMedicState
 from models.enums import StepType
 from models.schemas import FailureAnalysis, FailureCategory
 from services.nebius.client import Message, model_provider
+from services.log_pruner import RuntimeLogPruner
 
 logger = structlog.get_logger(__name__)
 
@@ -56,6 +57,10 @@ async def run(state: RepoMedicState) -> dict:
     failure_summary: str = test_result.get("failure_summary", "") or ""
     failing_tests: list[dict] = test_result.get("failing_tests", [])
 
+    # Apply task-aware log pruning (SWE-Pruner) to isolate failure stacktraces
+    log_pruning = RuntimeLogPruner.prune_pytest_output(stdout, stderr, max_chars=3000)
+    pruned_failure_text = log_pruning.pruned_text or failure_summary
+
     pre_class = _preClassify(stdout, stderr)
 
     # Build a failing-tests summary for the prompt
@@ -76,9 +81,8 @@ async def run(state: RepoMedicState) -> dict:
             role="user",
             content=(
                 "Analyze this test failure from an automated fix attempt.\n\n"
-                f"## Test Output Summary (last 30 lines)\n{failure_summary}\n\n"
+                f"## Pruned Diagnostic Failure Logs (SWE-Pruner)\n{pruned_failure_text}\n\n"
                 f"## Failing Tests\n{ft_text}\n\n"
-                f"## Stderr (first 2000 chars)\n{stderr[:2000]}\n\n"
                 f"## Patch Applied\n{patch_summary}\n\n"
                 f"## Plan Root Cause\n{plan.get('root_cause_hypothesis', '')}\n\n"
                 f"{hint}\n\n"
@@ -116,4 +120,7 @@ async def run(state: RepoMedicState) -> dict:
         root_cause=analysis.root_cause[:120],
     )
 
-    return {"failure_analysis": analysis.model_dump()}
+    return {
+        "failure_analysis": analysis.model_dump(),
+        "log_pruning": log_pruning.to_dict(),
+    }
