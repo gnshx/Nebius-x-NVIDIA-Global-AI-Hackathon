@@ -50,18 +50,9 @@ The submission video walks through the complete end-to-end engineering cycle:
 
 Rather than evaluating exclusively on synthetic mock files or static toy benchmarks, RepoMedic was proven in production against **[`python-humanize/humanize`](https://github.com/python-humanize/humanize)**, an active open-source project with **2,500+ GitHub stars**:
 
-```mermaid
-graph LR
-    A["GitHub Issue #466<br/>ValueError: Format specifier"] --> B["Tree-sitter AST Slicing<br/>1,420 tokens extracted"]
-    B --> C["NVIDIA Nemotron 30B MoE<br/>NVIDIA NIM CoT reasoning"]
-    C --> D["Hermetic Docker Sandbox<br/>241/241 tests pass in 0.20s"]
-    D --> E["Verified GitHub PR #467<br/>Merged-ready with full proof"]
-    style A fill:#1e293b,stroke:#ef4444,stroke-width:2px,color:#f8fafc
-    style B fill:#1e293b,stroke:#06b6d4,stroke-width:2px,color:#f8fafc
-    style C fill:#1e293b,stroke:#a855f7,stroke-width:2px,color:#f8fafc
-    style D fill:#1e293b,stroke:#10b981,stroke-width:2px,color:#f8fafc
-    style E fill:#1e293b,stroke:#10b981,stroke-width:2px,color:#f8fafc
-```
+<div align="center">
+  <img src="assets/pr467_journey.jpg" alt="RepoMedic Autonomous Bug Resolution Workflow on python-humanize #466" width="100%" style="border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.5); margin: 20px 0;" />
+</div>
 
 - **Target Repository:** [`python-humanize/humanize`](https://github.com/python-humanize/humanize) (2,500+ ★)
 - **Reported Defect:** [Issue #466: `intcomma(value, ndigits=-1)` crashes with `ValueError: Format specifier missing precision`](https://github.com/python-humanize/humanize/issues/466)

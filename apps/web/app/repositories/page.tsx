@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { getRepositories, registerRepository, VERIFIED_REPOSITORIES } from '@/lib/api';
 import { Repository } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
@@ -157,6 +158,7 @@ export default function RepositoriesPage() {
                 <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Branch</th>
                 <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Index Status</th>
                 <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Last Indexed</th>
+                <th className="text-right px-4 py-3 font-semibold text-muted-foreground">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -187,6 +189,14 @@ export default function RepositoriesPage() {
                   </td>
                   <td className="px-4 py-3 text-muted-foreground text-xs">
                     {formatDate(repo.last_indexed_at)}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <Link
+                      href="/runs"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-colors"
+                    >
+                      <span>Solve Issue</span>
+                    </Link>
                   </td>
                 </tr>
               ))}
