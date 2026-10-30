@@ -88,7 +88,7 @@ const STAGES: StageData[] = [
     icon: FileCode,
     color: 'from-purple-500/20 to-pink-500/10 border-purple-500/40 text-purple-400',
     badge: 'Language-Aware Parser',
-    nodes: ['Tree-sitter AST Parser', 'Call Hierarchy Traversal', 'Context Window Optimizer (1,420 tok)'],
+    nodes: ['Tree-sitter AST Parser', 'BiDirectional Causal Slicer', 'Dynamic Mock Synthesizer'],
     telemetry: {
       engine: 'Tree-sitter Python Grammar v0.21',
       latency: '240ms',
@@ -150,7 +150,7 @@ const STAGES: StageData[] = [
     icon: Terminal,
     color: 'from-amber-500/20 to-orange-500/10 border-amber-500/40 text-amber-400',
     badge: 'Zero-Hallucination Gate',
-    nodes: ['Isolated Pytest Container', 'Self-Healing 3-Iteration Cycle', '241/241 Tests Passing (0.20s)'],
+    nodes: ['Isolated Pytest Container', 'DeepSWE Multi-Seed Shuffler', 'SWE-Fuzz Dynamic Contract Fuzzer'],
     telemetry: {
       engine: 'Isolated Docker / Local Execution Sandbox',
       latency: '0.20s pytest runtime',
@@ -182,7 +182,8 @@ tests/test_number.py::test_fractional PASSED                             [ 44%]
     icon: ShieldCheck,
     color: 'from-emerald-500/25 to-green-500/10 border-emerald-500/50 text-emerald-400',
     badge: 'Production PR Created',
-    nodes: ['PatchValidator AST Security Guard', 'Verification Auditor (correct=True)', 'GitHub PR #467 Created & Dispatched'],
+    nodes: ['PatchValidator AST Security Guard', 'PEP 8 Patch Canonicalizer', 'GitHub PR #467 Created & Dispatched'],
+
     telemetry: {
       engine: 'PatchValidator AST Guard + GitHub REST API',
       latency: '320ms',

@@ -84,8 +84,9 @@ async def run(state: RepoMedicState) -> dict:
         # 1. Check if analyzing a local repository or demo directory
         custom_repo = state.get("repo_dir")
         local_dir = Path(custom_repo) if custom_repo and Path(custom_repo).exists() else None
-        if not local_dir and ("demo" in full_name.lower() or not installation_id) and Path("demo").exists():
-            local_dir = Path("demo")
+        demo_dir = Path("demo")
+        if not local_dir and ("demo" in full_name.lower() or not installation_id) and demo_dir.exists():
+            local_dir = demo_dir
 
         if local_dir:
             for p in local_dir.rglob("*"):
@@ -121,6 +122,7 @@ async def run(state: RepoMedicState) -> dict:
                 logger.warning("github_tree_fetch_failed", error=str(e))
                 if demo_dir.exists():
                     snapshot_path = _create_local_snapshot(demo_dir)
+
 
         test_files = [p for p in all_paths if _classify(p) == "test"]
         config_files = [p for p in all_paths if _classify(p) == "config"]
