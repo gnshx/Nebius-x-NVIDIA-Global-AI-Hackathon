@@ -8,6 +8,7 @@
 - **Elevator Pitch / Tagline:** Zero-hallucination autonomous program repair agent powered by NVIDIA Nemotron 30B MoE via NVIDIA NIM & hermetic container execution. Diagnoses bugs, generates AST-causal fixes, and verifies 100% test passing before opening PRs.
 - **Submission Track:** Coding & Agentic Engineering (Nebius & NVIDIA Track)
 - **Repository URL:** [https://github.com/gnshx/Nebius-x-NVIDIA-Global-AI-Hackathon](https://github.com/gnshx/Nebius-x-NVIDIA-Global-AI-Hackathon)
+- **Live Web Application (Vercel):** [https://repomedic-one.vercel.app](https://repomedic-one.vercel.app)
 - **Demo Video (YouTube):** [https://youtu.be/h__1uKTTd10](https://youtu.be/h__1uKTTd10) (1080p Full HD, 2m 24s)
 - **Demo Video (Direct MP4):** `assets/repomedic_demo.mp4` (4.12 MB)
 - **Real-World PR Proof:** [python-humanize/humanize #467](https://github.com/python-humanize/humanize/pull/467)

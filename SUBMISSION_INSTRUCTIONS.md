@@ -35,6 +35,7 @@ Follow these steps to submit RepoMedic to the **Nebius x NVIDIA Global AI Hackat
 - **GitHub Repo:** [https://github.com/gnshx/Nebius-x-NVIDIA-Global-AI-Hackathon](https://github.com/gnshx/Nebius-x-NVIDIA-Global-AI-Hackathon)
 - **Real Open-Source PR Proof:** [https://github.com/python-humanize/humanize/pull/467](https://github.com/python-humanize/humanize/pull/467)
 - **Real Open-Source Issue:** [https://github.com/python-humanize/humanize/issues/466](https://github.com/python-humanize/humanize/issues/466)
+- **Live Web App (Vercel):** [https://repomedic-one.vercel.app](https://repomedic-one.vercel.app)
 - **Local Web App:** `http://localhost:3000/`
 
 ---

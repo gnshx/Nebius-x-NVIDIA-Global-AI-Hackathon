@@ -7,6 +7,7 @@
 ### Autonomous Closed-Loop Program Repair Agent
 **Zero-hallucination, test-verified software repair powered by NVIDIA Nemotron 30B MoE via NVIDIA NIM & hermetic container sandboxes.**
 
+[![Live Demo](https://img.shields.io/badge/Live%20Web%20App-repomedic--one.vercel.app-000000?style=flat-square&logo=vercel&logoColor=white)](https://repomedic-one.vercel.app)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![Tests](https://img.shields.io/badge/Unit%20Tests-256%20Passed-10b981?style=flat-square&logo=pytest&logoColor=white)](tests/)
 [![YouTube](https://img.shields.io/badge/YouTube-Watch%20Demo%20(1080p)-FF0000?style=flat-square&logo=youtube&logoColor=white)](https://youtu.be/h__1uKTTd10)
@@ -20,7 +21,7 @@
 
 <br/>
 
-[**📺 Watch 1080p Demo (YouTube)**](https://youtu.be/h__1uKTTd10) · [**Real-World PR Proof**](#-real-world-open-source-validation-python-humanize-466) · [**Full Approach & Stack**](#-the-complete-approach--engineering-stack) · [**12-Node Pipeline**](#-12-node-deterministic-repair-pipeline) · [**15 SOTA Innovations**](#-15-sota-automated-program-repair-innovations) · [**Quick Start**](#-quick-start)
+[**🌐 Live Production App**](https://repomedic-one.vercel.app) · [**📺 Watch 1080p Demo (YouTube)**](https://youtu.be/h__1uKTTd10) · [**Real-World PR Proof**](#-real-world-open-source-validation-python-humanize-466) · [**Full Approach & Stack**](#-the-complete-approach--engineering-stack) · [**12-Node Pipeline**](#-12-node-deterministic-repair-pipeline) · [**15 SOTA Innovations**](#-15-sota-automated-program-repair-innovations) · [**Quick Start**](#-quick-start)
 
 </div>
 
