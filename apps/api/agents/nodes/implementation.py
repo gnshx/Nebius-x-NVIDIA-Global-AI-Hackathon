@@ -19,6 +19,8 @@ from models.schemas import Patch
 from services.nebius.client import Message, model_provider
 from services.patch_minimizer import PatchMinimizer
 from services.cross_validator import PatchCrossValidator
+from services.candidate_reranker import MultiCandidateReranker
+from services.preflight_auditor import AdversarialPreflightAuditor
 
 logger = structlog.get_logger(__name__)
 
@@ -150,11 +152,18 @@ async def run(state: RepoMedicState) -> dict:
     # Cross-validate patch against behavioral invariants (TEX 2026)
     cross_val_report = PatchCrossValidator.validate_patch(patch_dict.get("files", []))
 
+    # Pre-flight audit for debug leftovers and defect patterns (PROBE 2026)
+    preflight_report = AdversarialPreflightAuditor.audit_patch(patch_dict.get("files", []))
+
+    # Test-time multi-candidate reranking evaluation (Agentless / SWE-Reasoner 2026)
+    rerank_result = MultiCandidateReranker.rerank([patch_dict])
+
     logger.info(
         "implementation_complete",
         run_id=run_id,
         files_changed=len(patch.files),
         invariant_score=cross_val_report.invariant_score,
+        preflight_risk=preflight_report.risk_level,
         summary=patch.summary[:120],
     )
 
@@ -162,4 +171,6 @@ async def run(state: RepoMedicState) -> dict:
         "current_patch": patch_dict,
         "patch_history": patch_history,
         "cross_validation": cross_val_report.to_dict(),
+        "preflight_audit": preflight_report.to_dict(),
+        "reranking": rerank_result.to_dict(),
     }
