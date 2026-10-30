@@ -31,8 +31,11 @@ from services.coverage_auditor import CoverageTraceAuditor
 from services.trajectory_rubric import TrajectoryRubricEvaluator
 from services.order_independence_checker import OrderIndependenceChecker
 from services.regression_invariant_prober import RegressionInvariantProber
+from services.flakiness_seed_shuffler import FlakinessSeedShuffler
+from services.contract_fuzzer import DynamicContractFuzzer
 
 logger = structlog.get_logger(__name__)
+
 
 _MAX_DIFF_CHARS = 8_000
 
@@ -134,6 +137,12 @@ async def run(state: RepoMedicState) -> dict:
     )
     invariant_report = RegressionInvariantProber.probe_module_invariants(source_files_content)
 
+    # Multi-Seed Execution Shuffling & Determinism (DeepSWE / SWE-bench 2026)
+    flakiness_report = FlakinessSeedShuffler.audit_test_result(test_result)
+
+    # Dynamic Contract Fuzzing & Boundary Auditor (SWE-Fuzz 2026)
+    contract_fuzz_report = DynamicContractFuzzer.audit_code(source_files_content or diff_str)
+
     messages = [
         Message(
             role="user",
@@ -177,6 +186,16 @@ async def run(state: RepoMedicState) -> dict:
                 f"Order Independent: {isolation_report.is_order_independent}\n"
                 f"Isolation Score: {isolation_report.isolation_score * 100:.1f}%\n"
                 f"Hazards Detected: {len(isolation_report.state_hazards)}\n\n"
+                "## Multi-Seed Shuffling & Determinism (DeepSWE 2026)\n"
+                f"Deterministic: {flakiness_report.is_deterministic}\n"
+                f"Stability Score: {flakiness_report.stability_score * 100:.1f}%\n"
+                f"Flaky Tests: {len(flakiness_report.flaky_tests)}\n"
+                f"Recommendation: {flakiness_report.recommendation}\n\n"
+                "## Dynamic Contract Fuzzing & Boundaries (SWE-Fuzz 2026)\n"
+                f"Robust: {contract_fuzz_report.is_robust}\n"
+                f"Robustness Score: {contract_fuzz_report.overall_robustness_score * 100:.1f}%\n"
+                f"Fuzz Cases Checked: {contract_fuzz_report.total_fuzz_cases}\n"
+                f"Unhandled Edge Risks: {len(contract_fuzz_report.unhandled_edge_risks)}\n\n"
                 "## Regression Invariant Probing (SWE-bench Atlas ICLR 2026)\n"
                 f"Invariants Preserved: {invariant_report.invariants_preserved}\n"
                 f"Invariant Score: {invariant_report.invariant_score * 100:.1f}%\n"
@@ -223,5 +242,9 @@ async def run(state: RepoMedicState) -> dict:
         "trajectory_rubric": trajectory_report.to_dict(),
         "isolation_report": isolation_report.to_dict(),
         "invariant_report": invariant_report.to_dict(),
+        "flakiness_report": flakiness_report.to_dict(),
+        "contract_fuzz_report": contract_fuzz_report.to_dict(),
     }
+
+
 

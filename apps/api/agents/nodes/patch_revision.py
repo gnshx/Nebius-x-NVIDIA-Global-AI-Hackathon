@@ -169,11 +169,25 @@ async def run(state: RepoMedicState) -> dict:
     # Invariant cross-validation (TEX 2026)
     cross_val_report = PatchCrossValidator.validate_patch(revised_dict.get("files", []))
 
+    # Deterministic Patch Canonicalization (CanonicalPatch, FSE 2026)
+    from services.patch_canonicalizer import DeterministicPatchCanonicalizer
+    for f in revised_dict.get("files", []):
+        if f.get("patch"):
+            canon_res = DeterministicPatchCanonicalizer.canonicalize(f["patch"])
+            if canon_res.has_modifications:
+                f["patch"] = canon_res.canonical_diff
+
+    # Differential Resource Finalization & Leak Auditing (Amur, ASE 2025 / ICSE 2026)
+    from services.resource_finalization_auditor import DifferentialResourceFinalizationAuditor
+    diff_text = "\n".join(fc.get("patch", "") for fc in revised_dict.get("files", []))
+    resource_report = DifferentialResourceFinalizationAuditor.audit_code(diff_text)
+
     logger.info(
         "patch_revision_complete",
         run_id=run_id,
         files_revised=len(revised_patch.files),
         invariant_score=cross_val_report.invariant_score,
+        resource_safety_score=resource_report.safety_score,
         summary=revised_patch.summary[:120],
     )
 
@@ -184,4 +198,6 @@ async def run(state: RepoMedicState) -> dict:
         "log_pruning": log_pruning.to_dict(),
         "sampling_config": sampling_config.to_dict(),
         "evolutionary_candidate": prev_candidate.to_dict(),
+        "resource_finalization_audit": resource_report.to_dict(),
     }
+
