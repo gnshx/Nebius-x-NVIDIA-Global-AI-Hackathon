@@ -19,6 +19,7 @@ from models.orm import CodeChunk, Repository
 from models.enums import StepType
 from services.nebius.client import model_provider
 from services.context_slicer import ContextSlicer
+from services.issue_localization_reranker import IssueLocalizationReranker
 
 logger = structlog.get_logger(__name__)
 
@@ -142,10 +143,34 @@ async def run(state: RepoMedicState) -> dict:
                         "docstring": "",
                     })
 
-        # 4. AST-aware semantic context slicing (CODESTRUCT 2026)
+        # 4. Spectrum-Based Fault Localization (Ochiai & DStar - AutoCodeRover / LLM4FL 2026)
+        from services.spectrum_fault_localizer import SpectrumFaultLocalizer
+        test_res = state.get("test_result") or {}
+        raw_tb = [test_res.get("stdout", ""), test_res.get("stderr", ""), issue.get("body", "")]
+        sbfl_locations = SpectrumFaultLocalizer.localize_from_tracebacks(
+            failing_tracebacks=[t for t in raw_tb if t],
+            total_failed_tests=max(1, test_res.get("tests_failed", 1)),
+        )
+        if sbfl_locations:
+            high_suspicion_funcs = {loc.function_name.lower(): loc.ochiai_score for loc in sbfl_locations}
+            for c in chunks:
+                sym = (c.get("symbol") or "").lower()
+                if sym in high_suspicion_funcs:
+                    c["sbfl_ochiai_boost"] = high_suspicion_funcs[sym]
+
+        # 5. SweRank two-stage issue localization & structural reranking (Salesforce AI Research 2026)
+        rerank_report = IssueLocalizationReranker.rerank_chunks(
+            chunks,
+            issue_title=issue.get("title", ""),
+            issue_body=issue.get("body", "") or "",
+            likely_components=likely_components,
+        )
+        ranked_chunks = rerank_report.ranked_chunks if rerank_report.ranked_chunks else chunks
+
+        # 6. AST-aware semantic context slicing (CODESTRUCT 2026)
         target_symbols = likely_components + [Path(rf).stem for rf in relevant_files]
         sliced_result = ContextSlicer.slice_chunks(
-            chunks,
+            ranked_chunks,
             target_symbols=target_symbols,
             max_tokens=settings.max_context_tokens,
         )
@@ -157,9 +182,12 @@ async def run(state: RepoMedicState) -> dict:
         after_slicing=len(sliced_result.sliced_chunks),
         compression_ratio=sliced_result.compression_ratio,
         density_score=sliced_result.context_density_score,
+        localization_confidence=rerank_report.localization_confidence,
     )
 
     return {
         "retrieved_context": sliced_result.sliced_chunks,
         "context_slicing": sliced_result.to_dict(),
+        "issue_localization": rerank_report.to_dict(),
+        "sbfl_locations": [loc.to_dict() for loc in sbfl_locations],
     }

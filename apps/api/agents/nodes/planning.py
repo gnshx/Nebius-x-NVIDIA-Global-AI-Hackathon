@@ -81,6 +81,20 @@ async def run(state: RepoMedicState) -> dict:
     ]
 
     from services.compute_budget import ComplexityAnalyzer
+    from services.specification_invariant_miner import SpecificationInvariantMiner
+
+    miner = SpecificationInvariantMiner()
+    specs = miner.mine_specifications(
+        issue_description=f"{issue.get('title', '')}\n{issue.get('body', '')}"
+    )
+    spec_directives = "\n".join(f"- {s}" for s in specs)
+
+    # Append specification contracts to planning prompt
+    messages[0].content += (
+        "\n\n## Inferred Behavioral Preconditions & Contracts (VibeRepair 2026)\n"
+        f"{spec_directives}\n"
+        "Ensure the plan explicitly accounts for these boundary preconditions and return invariants."
+    )
 
     budget = ComplexityAnalyzer.allocate_budget(
         issue_title=issue.get("title", ""),
@@ -121,4 +135,5 @@ async def run(state: RepoMedicState) -> dict:
     return {
         "plan": plan.model_dump(),
         "compute_budget": budget.to_dict(),
+        "inferred_specifications": specs,
     }

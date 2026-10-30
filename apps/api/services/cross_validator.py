@@ -42,7 +42,7 @@ class CrossValidationReport(NamedTuple):
 
 
 class PatchCrossValidator:
-    """Audits patch diffs to guarantee behavioral invariants and prevent cheat patterns."""
+    """Audits patch diffs to enforce behavioral invariants and prevent cheat patterns."""
 
     # Patterns indicating cheating or destructive modifications in test files
     SUSPICIOUS_TEST_MODS = [

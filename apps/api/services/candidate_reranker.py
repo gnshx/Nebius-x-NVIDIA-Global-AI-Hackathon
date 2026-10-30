@@ -7,7 +7,7 @@ Implements test-time compute scaling and patch selection from:
 
 Evaluates and ranks candidate patches using multi-dimensional quality metrics:
 1. Edit Parsimony: Rewards atomic, localized diffs; penalizes extraneous file touches.
-2. Invariant Safety: Guarantees preservation of public API exports and test cases.
+2. Invariant Safety: Verifies preservation of public API exports and test cases.
 3. Cleanliness: Rewards normalized line-endings and absence of CodeSlop.
 """
 

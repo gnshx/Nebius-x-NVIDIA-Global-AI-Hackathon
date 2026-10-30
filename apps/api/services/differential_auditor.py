@@ -108,7 +108,7 @@ class DifferentialBehaviorAuditor:
         elif drift_count > 0:
             risk = "MEDIUM"
             is_preserved = False
-            rec = "Review public API signature changes to guarantee backward compatibility."
+            rec = "Review public API signature changes to preserve backward compatibility."
         else:
             risk = "LOW"
             is_preserved = True

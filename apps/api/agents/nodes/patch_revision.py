@@ -111,6 +111,24 @@ async def run(state: RepoMedicState) -> dict:
         ),
     ]
 
+    # Evolutionary Test-Time Scaling (Satori-SWE EvoScale 2026)
+    from services.evolutionary_patch_mutator import EvolutionaryPatchMutator
+    mutator = EvolutionaryPatchMutator()
+    prev_diff = "\n".join(fc.get("patch", "") for fc in current_patch.get("files", []))
+    prev_candidate = mutator.evaluate_candidate(
+        patch_id=f"iter_{iteration - 1}",
+        diff_content=prev_diff,
+        iteration=iteration - 1,
+        tests_passed=test_result.get("tests_passed", 0),
+        tests_total=test_result.get("tests_total", 0),
+        syntax_valid=True,
+        error_context=pruned_failure,
+    )
+    mutation_directives = mutator.formulate_mutation_prompt(
+        prev_candidate, failure_analysis.get("suggested_fix", "")
+    )
+    messages[1].content += f"\n\n{mutation_directives}"
+
     # Calibrate dynamic sampling hyperparameters (TTC / SWE-Reasoner 2026)
     failure_delta = state.get("failure_delta") or {}
     delta_verdict = failure_delta.get("delta_verdict")
@@ -165,4 +183,5 @@ async def run(state: RepoMedicState) -> dict:
         "cross_validation": cross_val_report.to_dict(),
         "log_pruning": log_pruning.to_dict(),
         "sampling_config": sampling_config.to_dict(),
+        "evolutionary_candidate": prev_candidate.to_dict(),
     }

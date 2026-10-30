@@ -5,7 +5,7 @@ Evaluates whether synthesized test cases and regression suites maintain strict
 order-independence and hermetic state isolation:
 1. Detects state-bleed hazards: uncleaned os.environ modifications, singleton mutation, global cache pollution.
 2. Generates reversed and shuffled execution permutation plans to stress-test oracle robustness.
-3. Quantifies an Isolation Score (0.0 to 1.0) and guarantees that tests pass symmetrically regardless of invocation order.
+3. Quantifies an Isolation Score (0.0 to 1.0) and verifies that tests pass symmetrically regardless of invocation order.
 """
 
 from __future__ import annotations
@@ -44,7 +44,7 @@ class OrderIndependenceChecker:
     HAZARD_PATTERNS = [
         (re.compile(r"os\.environ\[.+\]\s*="), "Unmocked os.environ direct mutation (leaks env state to subsequent tests)"),
         (re.compile(r"sys\.modules\[.+\]\s*="), "Unmocked sys.modules monkeypatching"),
-        (re.compile(r"(?:threading|multiprocessing)\.Lock\(\)"), "Global synchronization lock without guaranteed cleanup context manager"),
+        (re.compile(r"(?:threading|multiprocessing)\.Lock\(\)"), "Global synchronization lock without context manager cleanup"),
         (re.compile(r"\bopen\s*\([^)]+['\"]w"), "Unmocked local filesystem write without tempfile or tmp_path fixture"),
         (re.compile(r"global\s+\w+"), "Module-level global variable mutation in test function"),
     ]

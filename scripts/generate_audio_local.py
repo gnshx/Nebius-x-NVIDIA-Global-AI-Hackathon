@@ -25,7 +25,7 @@ PITCH_SCRIPT = (
     "built for the Nebius and NVIDIA Global AI Hackathon. "
     "Today, AI coding assistants generate code blindly, frequently producing hallucinated diffs "
     "that break continuous integration and burden open-source maintainers. "
-    "RepoMedic solves this with an absolute guarantee: zero hallucinated PRs. "
+    "RepoMedic solves this with a strict deterministic policy: zero unverified PRs. "
     "A pull request is never opened unless one hundred percent of unit and regression tests pass "
     "inside an isolated execution sandbox. "
     "At the heart of RepoMedic is NVIDIA Nemotron 3.5 Lightning, a thirty billion parameter "

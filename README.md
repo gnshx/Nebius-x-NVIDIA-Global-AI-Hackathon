@@ -264,7 +264,7 @@ Built specifically for the **Nebius × NVIDIA Global AI Hackathon (Coding and Ag
 - **Isolated Sandbox Execution**: True sandbox execution with resource quotas, 300s timeout guard, and automatic cleanup.
 
 ### 2. Quality of the Idea & Originality (25%)
-- **Zero Hallucinated PRs Guarantee**: Eliminates the fatal flaw of current AI coding assistants (submitting untested diffs that break CI). RepoMedic *refuses* to create a pull request unless 100% of unit and regression tests pass in the isolated sandbox.
+- **Zero Hallucinated PRs Policy (Deterministic Verification Gate)**: Eliminates the fatal flaw of current AI coding assistants (submitting untested diffs that break CI). RepoMedic *refuses* to create a pull request unless 100% of unit and regression tests pass in the isolated sandbox.
 - **Autonomous 3-Cycle Self-Healing**: When a patch fails tests, RepoMedic extracts the pytest stack trace, performs failure categorization, and self-corrects the implementation.
 - **Targeted Regression Test Synthesis**: Generates isolated test fixtures before touching production code to protect against future regressions.
 
@@ -274,7 +274,7 @@ Built specifically for the **Nebius × NVIDIA Global AI Hackathon (Coding and Ag
 - **Rich GitHub Pull Request Output**: Auto-formats PR descriptions with reproduction scripts, root-cause explanations, and test verification proof.
 
 ### 4. Potential Impact & Feasibility (25%)
-- **Reduces Maintainer Burnout**: Open-source maintainers spend 40% of their time triaging issues and testing broken fixes. RepoMedic compresses issue-to-verified-PR from hours of manual triage down to 1-3 minutes of automated sandbox verification.
+- **Reduces Maintainer Burnout**: Open-source maintainers spend hours each week triaging issues, reproducing failures, and testing broken fixes. RepoMedic compresses issue-to-verified-PR from hours of manual triage down to 1-3 minutes of automated sandbox verification.
 - **Zero Human Oversight Needed for Low-Risk Patches**: High verification confidence enables automated merging for clean bug fixes.
 - **Standardized GitHub App**: Zero client repository reconfiguration; install and trigger with `/repomedic fix`.
 
@@ -304,7 +304,7 @@ result = await executor.execute(sandbox_id, "pytest --tb=short --json-report")
 await executor.destroy(sandbox_id)  # always in finally block
 ```
 
-**Execution guarantees:**
+**Execution safeguards:**
 - Hard timeout per execution
 - Max log size (50 KB stdout/stderr cap)
 - Sandbox always destroyed in `finally` — no leaked resources

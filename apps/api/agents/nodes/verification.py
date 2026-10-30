@@ -30,6 +30,7 @@ from services.flakiness_quarantiner import FlakyTestQuarantiner
 from services.coverage_auditor import CoverageTraceAuditor
 from services.trajectory_rubric import TrajectoryRubricEvaluator
 from services.order_independence_checker import OrderIndependenceChecker
+from services.regression_invariant_prober import RegressionInvariantProber
 
 logger = structlog.get_logger(__name__)
 
@@ -125,6 +126,14 @@ async def run(state: RepoMedicState) -> dict:
         test_targets=touched_files,
     )
 
+    # Static Module & Sibling Invariant Probing (SWE-bench Atlas ICLR 2026)
+    source_files_content = "\n\n".join(
+        fc.get("content", "") or fc.get("patch", "")
+        for fc in current_patch.get("files", [])
+        if "test" not in fc.get("path", "").lower()
+    )
+    invariant_report = RegressionInvariantProber.probe_module_invariants(source_files_content)
+
     messages = [
         Message(
             role="user",
@@ -168,6 +177,10 @@ async def run(state: RepoMedicState) -> dict:
                 f"Order Independent: {isolation_report.is_order_independent}\n"
                 f"Isolation Score: {isolation_report.isolation_score * 100:.1f}%\n"
                 f"Hazards Detected: {len(isolation_report.state_hazards)}\n\n"
+                "## Regression Invariant Probing (SWE-bench Atlas ICLR 2026)\n"
+                f"Invariants Preserved: {invariant_report.invariants_preserved}\n"
+                f"Invariant Score: {invariant_report.invariant_score * 100:.1f}%\n"
+                f"Violations: {len(invariant_report.violations)}\n\n"
                 "## Deployment Readiness Index (DRI)\n"
                 f"DRI Score: {consensus_audit.dri_score}/100 ({consensus_audit.recommendation})\n"
                 f"Deployable: {consensus_audit.is_deployable}\n"
@@ -209,5 +222,6 @@ async def run(state: RepoMedicState) -> dict:
         "coverage_report": coverage_report.to_dict(),
         "trajectory_rubric": trajectory_report.to_dict(),
         "isolation_report": isolation_report.to_dict(),
+        "invariant_report": invariant_report.to_dict(),
     }
 

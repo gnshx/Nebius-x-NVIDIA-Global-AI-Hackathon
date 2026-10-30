@@ -312,7 +312,7 @@ export const VERIFIED_RUNS: AgentRun[] = [
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 600);
+  const timeoutId = setTimeout(() => controller.abort(), 2500);
 
   try {
     const res = await fetch(`${API_URL}${path}`, {

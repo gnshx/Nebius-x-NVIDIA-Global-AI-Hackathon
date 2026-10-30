@@ -152,7 +152,7 @@ const AGENT_NODES: AgentNodeDef[] = [
     category: 'execution',
     position: [5.8, 3.2, -0.6],
     color: '#10B981',
-    description: 'Runs pytest in an isolated environment against full regression suite. 100% pass required.',
+    description: 'Runs pytest in an isolated environment against full regression suite. All tests must pass.',
     telemetry: {
       latency: '2.10s',
       model: 'Docker Isolated Sandbox Container',
@@ -180,7 +180,7 @@ const AGENT_NODES: AgentNodeDef[] = [
     category: 'security',
     position: [6.8, -0.4, 0.6],
     color: '#76B900',
-    description: 'Final multi-dimensional pass/fail check. Guarantees zero unverified code reaches production.',
+    description: 'Final multi-dimensional pass/fail check. Enforces that zero unverified code reaches production.',
     telemetry: {
       latency: '60ms',
       model: 'Deterministic Verification Gate',
@@ -645,7 +645,7 @@ export function ThreeAgentVisualizer() {
             ) : (
               <>
                 <Volume2 className="h-3.5 w-3.5" />
-                <span>Play Voiceover (100% Local TTS)</span>
+                <span>Play Voiceover (Local Neural TTS)</span>
               </>
             )}
           </button>

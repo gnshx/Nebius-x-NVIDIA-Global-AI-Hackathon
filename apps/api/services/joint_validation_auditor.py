@@ -9,7 +9,7 @@ Evaluates synthesized test oracles across three essential dimensions:
 2. Positive Conformance (P_conf): Does the test pass against the validated fix?
 3. Negative Discrimination (N_disc): Does the test reject empty or cheat patches without tautologies?
 
-A test suite with high JVR guarantees that tests do not simply pass superficially,
+A test suite with high JVR confirms that tests do not simply pass superficially,
 but actively discriminate correct vs defective implementations.
 """
 

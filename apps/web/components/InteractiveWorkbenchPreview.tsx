@@ -261,7 +261,7 @@ export function InteractiveWorkbenchPreview() {
                     <span>NVIDIA Nemotron 30B MoE Diagnosis</span>
                   </div>
                   <p className="text-[11px] text-zinc-400 leading-normal">
-                    Previously, passing <code className="text-zinc-300 bg-zinc-800 px-1 py-0.5 rounded font-mono">ndigits=-1</code> propagated into Python float formatting <code className="text-zinc-300 bg-zinc-800 px-1 py-0.5 rounded font-mono">f&quot;.&#123;ndigits&#125;f&quot;</code>, raising <code className="text-red-400 font-mono">ValueError: Format specifier missing precision</code>. The boundary check safely raises a descriptive ValueError and preserves 100% backwards compatibility.
+                    Previously, passing <code className="text-zinc-300 bg-zinc-800 px-1 py-0.5 rounded font-mono">ndigits=-1</code> propagated into Python float formatting <code className="text-zinc-300 bg-zinc-800 px-1 py-0.5 rounded font-mono">f&quot;.&#123;ndigits&#125;f&quot;</code>, raising <code className="text-red-400 font-mono">ValueError: Format specifier missing precision</code>. The boundary check safely raises a descriptive ValueError and preserves backwards compatibility.
                   </p>
                 </div>
               </div>

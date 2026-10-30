@@ -155,6 +155,11 @@ async def run(state: RepoMedicState) -> dict:
     # Pre-flight audit for debug leftovers and defect patterns (PROBE 2026)
     preflight_report = AdversarialPreflightAuditor.audit_patch(patch_dict.get("files", []))
 
+    # Adaptive type-constraint decoding verification (PLDI 2025 / AdapTrack 2026)
+    from services.adaptive_type_constraint_verifier import AdaptiveTypeConstraintVerifier
+    diff_text = "\n".join(fc.get("patch", "") for fc in patch_dict.get("files", []))
+    type_report = AdaptiveTypeConstraintVerifier.verify_response(diff_text)
+
     # Test-time multi-candidate reranking evaluation (Agentless / SWE-Reasoner 2026)
     rerank_result = MultiCandidateReranker.rerank([patch_dict])
 
@@ -164,6 +169,7 @@ async def run(state: RepoMedicState) -> dict:
         files_changed=len(patch.files),
         invariant_score=cross_val_report.invariant_score,
         preflight_risk=preflight_report.risk_level,
+        type_safety_score=type_report.type_safety_score,
         summary=patch.summary[:120],
     )
 
@@ -172,5 +178,6 @@ async def run(state: RepoMedicState) -> dict:
         "patch_history": patch_history,
         "cross_validation": cross_val_report.to_dict(),
         "preflight_audit": preflight_report.to_dict(),
+        "type_constraint_audit": type_report.to_dict(),
         "reranking": rerank_result.to_dict(),
     }

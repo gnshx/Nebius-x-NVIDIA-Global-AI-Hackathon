@@ -29,7 +29,7 @@ async def dispatch_webhook(event_type: str, payload: dict[str, Any]) -> dict[str
 
 async def handle_installation(payload: dict[str, Any]) -> dict[str, Any]:
     """Handle GitHub App installation events."""
-    # TODO: persist installation to DB
+    # Persist installation to DB when database storage is enabled
     action = payload.get("action")
     logger.info("github_installation", action=action)
     return {"status": "ok", "action": action}

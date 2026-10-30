@@ -167,7 +167,7 @@ export default async function HomePage() {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono text-zinc-400 bg-muted px-2.5 py-1 rounded border">
-              WebGL 60 FPS • 100% Local TTS
+              WebGL 60 FPS • Local Neural TTS
             </span>
           </div>
         </div>
@@ -344,14 +344,14 @@ export default async function HomePage() {
             </ul>
           </div>
 
-          {/* Pillar 2: Zero-Hallucination Guarantee */}
+          {/* Pillar 2: Zero-Hallucination Verification Policy */}
           <div className="rounded-xl border bg-card p-6 space-y-3 shadow-sm hover:border-primary/50 transition-colors">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400">
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="font-semibold text-base">The Zero-Hallucination Guarantee</h3>
+                <h3 className="font-semibold text-base">Zero-Hallucination Verification Policy</h3>
                 <span className="text-xs text-muted-foreground">Deterministic Sandbox Verification Gate</span>
               </div>
             </div>
@@ -408,7 +408,7 @@ export default async function HomePage() {
             </div>
             <ul className="text-sm text-muted-foreground space-y-2 list-disc list-inside">
               <li>
-                <strong className="text-foreground">Velocity Shift:</strong> Open-source maintainers spend 40% of their time triaging issues and reviewing broken PRs. RepoMedic reduces resolution time from hours of manual triage down to 1-3 minutes of automated, test-verified execution.
+                <strong className="text-foreground">Velocity Shift:</strong> Open-source maintainers spend hours each week triaging issues, reproducing failures, and reviewing broken PRs. RepoMedic reduces resolution time from hours of manual triage down to 1-3 minutes of automated, test-verified execution.
               </li>
               <li>
                 <strong className="text-foreground">High-Confidence Automation:</strong> By enforcing strict sandbox verification, maintainers can safely enable automated merge for verified low-risk bug fixes.

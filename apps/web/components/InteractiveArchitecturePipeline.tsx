@@ -154,7 +154,7 @@ const STAGES: StageData[] = [
     telemetry: {
       engine: 'Isolated Docker / Local Execution Sandbox',
       latency: '0.20s pytest runtime',
-      throughput: '100% test pass rate',
+      throughput: '241/241 tests passing',
       memory: '142 MB container limit',
       status: 'ZERO REGRESSIONS',
     },
@@ -171,7 +171,7 @@ tests/test_number.py::test_intcomma_negative_ndigits PASSED              [ 43%]
 tests/test_number.py::test_fractional PASSED                             [ 44%]
 ...
 ======================== 241 passed in 0.20s ===========================`,
-      explanation: 'Strict pass/fail gate. Pull requests are strictly blocked at the deterministic verification gate unless 100% of unit tests pass.',
+      explanation: 'Strict pass/fail gate. Pull requests are strictly blocked at the deterministic verification gate unless all sandbox unit tests pass.',
     },
   },
   {
