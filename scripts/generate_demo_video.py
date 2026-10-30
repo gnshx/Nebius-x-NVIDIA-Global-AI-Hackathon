@@ -95,10 +95,19 @@ def main():
         print(f"🎉 Demo video generated successfully! Saved to: {output_video}")
         if temp_concat_txt.exists():
             temp_concat_txt.unlink()
+
+        # Synchronize to web public assets
+        web_assets = root_dir / "apps" / "web" / "public" / "assets"
+        if web_assets.exists():
+            import shutil
+            shutil.copy2(output_video, web_assets / output_video.name)
+            print(f"📦 Synced demo video to web assets: {web_assets / output_video.name}")
+
         return 0
     except subprocess.CalledProcessError as e:
         print(f"❌ FFmpeg error: {e.stderr.decode('utf-8')[:300]}", file=sys.stderr)
         return 1
+
 
 
 if __name__ == "__main__":

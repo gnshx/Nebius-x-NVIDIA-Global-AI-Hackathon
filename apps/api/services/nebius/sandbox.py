@@ -44,14 +44,20 @@ class SandboxExecutor:
         self._max_log_bytes: int = settings.nebius_sandbox_max_log_bytes
 
     def _client(self) -> httpx.AsyncClient:
+        token = (
+            settings.nebius_sandbox_api_key.get_secret_value()
+            if settings.nebius_sandbox_api_key
+            else settings.nebius_api_key.get_secret_value()
+        )
         return httpx.AsyncClient(
             base_url=self._base_url,
             headers={
-                "Authorization": f"Bearer {settings.nebius_api_key.get_secret_value()}",
+                "Authorization": f"Bearer {token}",
                 "Content-Type": "application/json",
             },
             timeout=360,
         )
+
 
     async def create_sandbox(self, repo_tarball: bytes) -> str:
         """
