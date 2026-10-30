@@ -17,13 +17,15 @@ import {
   ExternalLink,
   Code2,
   Box,
-  Compass
+  Compass,
+  Video
 } from 'lucide-react';
 import { AgentRun } from '@/lib/types';
 import { ThreeAgentVisualizer } from '@/components/ThreeAgentVisualizer';
 import { InteractiveArchitecturePipeline } from '@/components/InteractiveArchitecturePipeline';
 import { InteractiveWorkbenchPreview } from '@/components/InteractiveWorkbenchPreview';
 import { RepoMedicLogo } from '@/components/RepoMedicLogo';
+import { DemoVideoPlayer } from '@/components/DemoVideoPlayer';
 
 async function getStats() {
   try {
@@ -83,6 +85,13 @@ export default async function HomePage() {
           >
             Launch Live Dashboard <ArrowRight className="h-4 w-4" />
           </Link>
+          <a
+            href="#demo-video"
+            className="inline-flex items-center gap-2 border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 px-5 py-3 rounded-lg font-medium transition-all text-sm shadow-sm"
+          >
+            <Video className="h-4 w-4 text-emerald-400" />
+            Watch Submission Video (1080p)
+          </a>
           <a
             href="#threejs-canvas"
             className="inline-flex items-center gap-2 border border-zinc-800 bg-card/80 backdrop-blur-sm px-5 py-3 rounded-lg font-medium hover:bg-muted/50 hover:border-zinc-700 transition-all text-sm"
@@ -150,7 +159,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 3D Three.js Interactive Agent Visualizer (Replacing Plain Video) */}
+      {/* Official Submission Demo Video Player */}
+      <DemoVideoPlayer />
+
+      {/* 3D Three.js Interactive Agent Visualizer */}
       <section id="threejs-canvas" className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
