@@ -29,6 +29,7 @@ from services.consensus_auditor import PatchConsensusAuditor
 from services.flakiness_quarantiner import FlakyTestQuarantiner
 from services.coverage_auditor import CoverageTraceAuditor
 from services.trajectory_rubric import TrajectoryRubricEvaluator
+from services.order_independence_checker import OrderIndependenceChecker
 
 logger = structlog.get_logger(__name__)
 
@@ -118,6 +119,12 @@ async def run(state: RepoMedicState) -> dict:
         localized_files=plan.get("files_to_modify", touched_files),
     )
 
+    # Order Independence & Hermetic State Guard (DeepSWE 2026)
+    isolation_report = OrderIndependenceChecker.audit_test_diff(
+        test_diff=diff_str,
+        test_targets=touched_files,
+    )
+
     messages = [
         Message(
             role="user",
@@ -157,6 +164,10 @@ async def run(state: RepoMedicState) -> dict:
                 "## Test Flakiness & Quarantine\n"
                 f"Deterministic Suite Confidence: {quarantine_report.deterministic_suite_confidence * 100:.1f}%\n"
                 f"Quarantined Tests: {quarantine_report.quarantined_count}\n\n"
+                "## Test Order Independence & Hermetic Isolation (DeepSWE 2026)\n"
+                f"Order Independent: {isolation_report.is_order_independent}\n"
+                f"Isolation Score: {isolation_report.isolation_score * 100:.1f}%\n"
+                f"Hazards Detected: {len(isolation_report.state_hazards)}\n\n"
                 "## Deployment Readiness Index (DRI)\n"
                 f"DRI Score: {consensus_audit.dri_score}/100 ({consensus_audit.recommendation})\n"
                 f"Deployable: {consensus_audit.is_deployable}\n"
@@ -197,4 +208,6 @@ async def run(state: RepoMedicState) -> dict:
         "quarantine_report": quarantine_report.to_dict(),
         "coverage_report": coverage_report.to_dict(),
         "trajectory_rubric": trajectory_report.to_dict(),
+        "isolation_report": isolation_report.to_dict(),
     }
+

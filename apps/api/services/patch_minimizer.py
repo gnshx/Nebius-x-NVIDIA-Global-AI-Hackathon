@@ -20,6 +20,7 @@ from typing import NamedTuple
 import structlog
 
 from models.schemas import FileChange, Patch
+from services.selective_hunk_auditor import SelectiveHunkAuditor
 
 logger = structlog.get_logger(__name__)
 
@@ -102,6 +103,12 @@ class PatchMinimizer:
 
         for change in patch.files:
             cleaned_diff = cls.clean_hunk_diff(change.patch)
+
+            # Perform granular hunk auditing and stage essential hunks (DeepSWE / CodeMonkeys)
+            if change.operation == "modify" and cleaned_diff:
+                hunk_audit = SelectiveHunkAuditor.audit_and_stage_diff(cleaned_diff, change.path)
+                if hunk_audit.staged_diff and hunk_audit.essential_hunks > 0:
+                    cleaned_diff = hunk_audit.staged_diff
 
             # Check if this change has actual diff hunks
             has_diff_content = any(
