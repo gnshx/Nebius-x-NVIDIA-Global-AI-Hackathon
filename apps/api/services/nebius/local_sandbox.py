@@ -36,7 +36,40 @@ DOCKER_IMAGE = "python:3.12-slim"
 
 def _apply_unified_patch_to_dir(workdir: Path, patch_text: str) -> bool:
     """Apply a unified diff patch to files in workdir using robust hunk matching."""
-    # Split patch by file (--- a/ ... +++ b/ ...)
+    if not patch_text or not patch_text.strip():
+        return False
+
+    # Attempt 1: If git repo exists, try 'git apply'
+    if (workdir / ".git").exists() and shutil.which("git"):
+        try:
+            res = subprocess.run(
+                ["git", "apply", "--whitespace=nowarn", "--ignore-space-change", "-"],
+                input=patch_text.encode("utf-8"),
+                cwd=str(workdir),
+                capture_output=True,
+                check=False,
+            )
+            if res.returncode == 0:
+                return True
+        except Exception:
+            pass
+
+    # Attempt 2: If patch tool exists, try 'patch -p1'
+    if shutil.which("patch"):
+        try:
+            res = subprocess.run(
+                ["patch", "-p1", "-N", "--batch", "-r", "-"],
+                input=patch_text.encode("utf-8"),
+                cwd=str(workdir),
+                capture_output=True,
+                check=False,
+            )
+            if res.returncode == 0:
+                return True
+        except Exception:
+            pass
+
+    # Attempt 3: Pure Python resilient hunk engine
     file_patches = re.split(r"(?=^--- )", patch_text, flags=re.MULTILINE)
     applied_any = False
 
@@ -57,7 +90,7 @@ def _apply_unified_patch_to_dir(workdir: Path, patch_text: str) -> bool:
 
         file_path = workdir / target_file
         if not file_path.exists():
-            # Might be file creation
+            # File creation
             new_lines = [l[1:] for l in lines if l.startswith("+") and not l.startswith("+++ ")]
             file_path.parent.mkdir(parents=True, exist_ok=True)
             file_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
@@ -66,41 +99,55 @@ def _apply_unified_patch_to_dir(workdir: Path, patch_text: str) -> bool:
 
         # Modify existing file
         orig_content = file_path.read_text(encoding="utf-8")
-        orig_lines = orig_content.splitlines(keepends=True)
 
-        # Parse hunks
-        hunk_pattern = re.compile(r"^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@", re.MULTILINE)
-        hunk_starts = [m.start() for m in hunk_pattern.finditer(fp)]
-        if not hunk_starts:
-            continue
+        # Split into hunks by @@ header
+        hunk_splits = re.split(r"(?=^@@ )", fp, flags=re.MULTILINE)
+        content_cursor = orig_content
 
-        # Extract replacements: lines with - vs +
-        minus_lines = [l[1:].strip() for l in lines if l.startswith("-") and not l.startswith("--- ")]
-        plus_lines = [l[1:].strip() for l in lines if l.startswith("+") and not l.startswith("+++ ")]
-
-        if minus_lines and plus_lines:
-            target_str = "\n".join(minus_lines)
-            repl_str = "\n".join(plus_lines)
-            # Try simple replacement if substring matches
-            if target_str in orig_content:
-                new_content = orig_content.replace(target_str, repl_str, 1)
-                file_path.write_text(new_content, encoding="utf-8")
-                applied_any = True
+        for hunk_block in hunk_splits:
+            if not hunk_block.startswith("@@"):
                 continue
 
-            # Fallback line-by-line replacement
-            new_lines = []
-            for oline in orig_lines:
-                replaced = False
-                for m_line, p_line in zip(minus_lines, plus_lines):
-                    if m_line in oline:
-                        new_lines.append(oline.replace(m_line, p_line))
-                        replaced = True
+            hunk_lines = hunk_block.splitlines()
+            old_hunk_lines = []
+            new_hunk_lines = []
+
+            for hl in hunk_lines[1:]:  # skip @@ line
+                if hl.startswith("-"):
+                    old_hunk_lines.append(hl[1:])
+                elif hl.startswith("+"):
+                    new_hunk_lines.append(hl[1:])
+                elif hl.startswith(" "):
+                    old_hunk_lines.append(hl[1:])
+                    new_hunk_lines.append(hl[1:])
+                elif not hl.strip():
+                    # Empty context line in some diff format variations
+                    old_hunk_lines.append("")
+                    new_hunk_lines.append("")
+
+            old_str = "\n".join(old_hunk_lines)
+            new_str = "\n".join(new_hunk_lines)
+
+            if old_str in content_cursor:
+                content_cursor = content_cursor.replace(old_str, new_str, 1)
+                applied_any = True
+            else:
+                # Fuzzy fallback: match ignoring leading/trailing line whitespace
+                old_stripped = "\n".join(l.strip() for l in old_hunk_lines if l.strip())
+                curr_lines = content_cursor.splitlines()
+                # Search for matching slice in curr_lines
+                n_old = len(old_hunk_lines)
+                for start_idx in range(len(curr_lines) - n_old + 1):
+                    window = curr_lines[start_idx : start_idx + n_old]
+                    window_stripped = "\n".join(l.strip() for l in window if l.strip())
+                    if window_stripped == old_stripped:
+                        curr_lines[start_idx : start_idx + n_old] = new_hunk_lines
+                        content_cursor = "\n".join(curr_lines)
+                        applied_any = True
                         break
-                if not replaced:
-                    new_lines.append(oline)
-            file_path.write_text("".join(new_lines), encoding="utf-8")
-            applied_any = True
+
+        if applied_any:
+            file_path.write_text(content_cursor, encoding="utf-8")
 
     return applied_any
 
