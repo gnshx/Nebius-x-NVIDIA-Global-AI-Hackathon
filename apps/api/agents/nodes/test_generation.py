@@ -19,6 +19,7 @@ from models.enums import StepType
 from models.schemas import FileChange, Patch
 from services.nebius.client import Message, model_provider
 from services.mutation_tester import MutationTester
+from services.boundary_prober import BoundaryProber
 
 logger = structlog.get_logger(__name__)
 
@@ -60,6 +61,13 @@ async def run(state: RepoMedicState) -> dict:
 
     patch_summary = _format_patch_summary(current_patch)
 
+    # Infer boundary condition edge cases from patch/context (PROBE 2026)
+    boundary_probing = BoundaryProber.probe_function(test_ctx + "\n" + patch_summary)
+    probe_hints = "\n".join(
+        f"  - Parameter '{p.parameter_name}': Test edge value `{p.edge_value_repr}` ({p.rationale})"
+        for p in boundary_probing.probes[:4]
+    )
+
     messages = [
         Message(
             role="system",
@@ -83,6 +91,8 @@ async def run(state: RepoMedicState) -> dict:
                 + ("\n".join(f"  - {t}" for t in tests_to_add) or "  (none specified — infer from issue)") + "\n\n"
                 "## Tests to Modify\n"
                 + ("\n".join(f"  - {t}" for t in tests_to_modify) or "  (none)") + "\n\n"
+                "## Suggested Boundary Condition Probes (PROBE 2026)\n"
+                + (probe_hints or "  (none inferred)") + "\n\n"
                 "## Existing Test Code\n"
                 f"{test_ctx or '(no existing tests retrieved)'}\n\n"
                 "Generate minimal, focused regression tests. Each test must directly "
@@ -133,4 +143,5 @@ async def run(state: RepoMedicState) -> dict:
         "current_patch": merged_patch,
         "generated_tests": [fc.model_dump() for fc in test_patch.files],
         "test_quality": test_quality_report.to_dict(),
+        "boundary_probing": boundary_probing.to_dict(),
     }

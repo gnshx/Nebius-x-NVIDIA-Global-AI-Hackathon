@@ -17,6 +17,7 @@ from models.enums import StepType
 from models.schemas import IssueAnalysis
 from services.github.client import github_client
 from services.nebius.client import Message, model_provider
+from services.traceback_distiller import TracebackDistiller
 
 logger = structlog.get_logger(__name__)
 
@@ -80,6 +81,21 @@ async def run(state: RepoMedicState) -> dict:
         repo=repository.get("full_name"),
     )
 
+    body_text = issue.get("body", "") or ""
+    repo_name = repository.get("name", "")
+    trace_distillation = TracebackDistiller.distill(
+        body_text,
+        repo_keywords=[repo_name, "src", "lib"]
+    )
+
+    fault_path_prompt = ""
+    if trace_distillation.culprit_file:
+        fault_path_prompt = (
+            f"\n\n## Distilled Fault Path (RGFL 2026)\n"
+            f"{trace_distillation.distilled_traceback}\n"
+            f"Culprit Candidate: {trace_distillation.culprit_file}:{trace_distillation.culprit_line} in {trace_distillation.culprit_function}"
+        )
+
     messages = [
         Message(
             role="system",
@@ -94,9 +110,10 @@ async def run(state: RepoMedicState) -> dict:
             content=(
                 "Analyze this GitHub issue and extract structured information about the bug:\n\n"
                 f"- Issue title: {issue.get('title', '')}\n"
-                f"- Issue body: {issue.get('body', '') or '(no body)'}\n"
+                f"- Issue body: {body_text or '(no body)'}\n"
                 f"- Repository: {repository.get('full_name', '')}\n"
-                f"- Languages: {repository.get('language', 'unknown')}\n\n"
+                f"- Languages: {repository.get('language', 'unknown')}"
+                f"{fault_path_prompt}\n\n"
                 "Identify the problem statement, expected vs observed behavior, "
                 "likely source components, relevant files, and acceptance criteria."
             ),
@@ -126,4 +143,5 @@ async def run(state: RepoMedicState) -> dict:
         "issue": issue,
         "repository": repository,
         "issue_analysis": analysis.model_dump(),
+        "traceback_distillation": trace_distillation.to_dict(),
     }
