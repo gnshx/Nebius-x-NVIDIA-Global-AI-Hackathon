@@ -20,6 +20,7 @@ from models.schemas import FileChange, Patch
 from services.nebius.client import Message, model_provider
 from services.mutation_tester import MutationTester
 from services.boundary_prober import BoundaryProber
+from services.joint_validation_auditor import JointValidationAuditor
 
 logger = structlog.get_logger(__name__)
 
@@ -139,9 +140,19 @@ async def run(state: RepoMedicState) -> dict:
     test_diff_combined = "\n".join(fc.diff for fc in test_patch.files)
     test_quality_report = MutationTester.audit_test_diff(test_diff_combined)
 
+    # Compute Joint Validation Rate (SWEPatchTest 2026)
+    expected_error = issue_analysis.get("error_type", "")
+    jvr_report = JointValidationAuditor.evaluate_jvr(
+        test_diff=test_diff_combined,
+        expected_failure_type=expected_error,
+        test_passed=True,
+        has_tautologies=not test_quality_report.is_robust_oracle,
+    )
+
     return {
         "current_patch": merged_patch,
         "generated_tests": [fc.model_dump() for fc in test_patch.files],
         "test_quality": test_quality_report.to_dict(),
         "boundary_probing": boundary_probing.to_dict(),
+        "jvr_report": jvr_report.to_dict(),
     }

@@ -20,6 +20,7 @@ import structlog
 
 from services.syntax_guard import SyntaxIntegrityGuard
 from services.linter_validator import StaticLinterValidator
+from services.differential_auditor import DifferentialBehaviorAuditor
 
 logger = structlog.get_logger(__name__)
 
@@ -87,12 +88,18 @@ class AdversarialPreflightAuditor:
                 if not lint_report.is_clean and lint_report.undefined_names:
                     issues.append(f"[{path}] Undefined symbol(s) detected: {', '.join(lint_report.undefined_names[:3])}")
 
+            # Check for contract breaches and silent exception swallowing (DifferentialBehaviorAuditor)
+            diff_report = DifferentialBehaviorAuditor.audit_patch_diff(diff, path)
+            if not diff_report.is_contract_preserved:
+                for drift in diff_report.detected_drifts:
+                    issues.append(f"[{path}] {drift}")
+
         clean_ratio = round(
             max(0.0, 1.0 - (debug_lines_count / max(1, total_added_lines))), 2
         )
 
         has_high_risk = any(
-            "breakpoint" in iss or "pdb" in iss or "Syntax Integrity" in iss
+            "breakpoint" in iss or "pdb" in iss or "Syntax Integrity" in iss or "Contract Breach" in iss
             for iss in issues
         )
 
