@@ -81,3 +81,5 @@ temp/
 *.bak
 test_repos/
 *.tsbuildinfo
+.vercel
+.env*
