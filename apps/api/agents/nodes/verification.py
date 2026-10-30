@@ -26,6 +26,7 @@ from services.nebius.client import Message, model_provider
 from services.oracle_evaluator import OracleEvaluator
 from services.patch_minimizer import PatchMinimizer
 from services.consensus_auditor import PatchConsensusAuditor
+from services.flakiness_quarantiner import FlakyTestQuarantiner
 
 logger = structlog.get_logger(__name__)
 
@@ -92,6 +93,12 @@ async def run(state: RepoMedicState) -> dict:
         security_passed=True,
     )
 
+    # Flaky Test Quarantine Evaluation (SWE-bench Verified 2026)
+    quarantiner = FlakyTestQuarantiner()
+    for ft in test_result.get("failing_tests", []):
+        quarantiner.record_test_run(ft.get("name", ""), False, ft.get("message", ""))
+    quarantine_report = quarantiner.generate_report(test_result.get("tests_total", 0) or 1)
+
     messages = [
         Message(
             role="user",
@@ -117,6 +124,9 @@ async def run(state: RepoMedicState) -> dict:
                 f"Pass-to-Pass (P->P): {oracle_eval.pass_to_pass_passed}/{oracle_eval.pass_to_pass_total} maintained\n"
                 f"Cleanliness Score: {oracle_eval.cleanliness_score * 100:.1f}%\n"
                 f"Details: {oracle_eval.details}\n\n"
+                "## Test Flakiness & Quarantine\n"
+                f"Deterministic Suite Confidence: {quarantine_report.deterministic_suite_confidence * 100:.1f}%\n"
+                f"Quarantined Tests: {quarantine_report.quarantined_count}\n\n"
                 "## Deployment Readiness Index (DRI)\n"
                 f"DRI Score: {consensus_audit.dri_score}/100 ({consensus_audit.recommendation})\n"
                 f"Deployable: {consensus_audit.is_deployable}\n"
@@ -154,4 +164,5 @@ async def run(state: RepoMedicState) -> dict:
         "patch_review": review.model_dump(),
         "oracle_evaluation": oracle_eval.to_dict(),
         "consensus_audit": consensus_audit.to_dict(),
+        "quarantine_report": quarantine_report.to_dict(),
     }
