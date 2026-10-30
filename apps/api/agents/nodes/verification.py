@@ -27,6 +27,8 @@ from services.oracle_evaluator import OracleEvaluator
 from services.patch_minimizer import PatchMinimizer
 from services.consensus_auditor import PatchConsensusAuditor
 from services.flakiness_quarantiner import FlakyTestQuarantiner
+from services.coverage_auditor import CoverageTraceAuditor
+from services.trajectory_rubric import TrajectoryRubricEvaluator
 
 logger = structlog.get_logger(__name__)
 
@@ -99,6 +101,23 @@ async def run(state: RepoMedicState) -> dict:
         quarantiner.record_test_run(ft.get("name", ""), False, ft.get("message", ""))
     quarantine_report = quarantiner.generate_report(test_result.get("tests_total", 0) or 1)
 
+    # Coverage Trace Execution Audit (SWE-ABS 2026)
+    touched_files = [fc.get("path", "") for fc in current_patch.get("files", []) if fc.get("path")]
+    coverage_report = CoverageTraceAuditor.audit_trace(
+        patch_diff=diff_str,
+        test_output=f"{test_result.get('stdout', '')}\n{test_result.get('stderr', '')}",
+        modified_files=touched_files,
+    )
+
+    # Trajectory Rubric PRM Evaluation (SWE-TRACE 2026)
+    failure_history = [int(test_result.get("tests_failed", 0))]
+    trajectory_report = TrajectoryRubricEvaluator.evaluate(
+        iteration=iteration,
+        failure_counts=failure_history,
+        touched_files=touched_files,
+        localized_files=plan.get("files_to_modify", touched_files),
+    )
+
     messages = [
         Message(
             role="user",
@@ -124,6 +143,17 @@ async def run(state: RepoMedicState) -> dict:
                 f"Pass-to-Pass (P->P): {oracle_eval.pass_to_pass_passed}/{oracle_eval.pass_to_pass_total} maintained\n"
                 f"Cleanliness Score: {oracle_eval.cleanliness_score * 100:.1f}%\n"
                 f"Details: {oracle_eval.details}\n\n"
+                "## Coverage Trace Audit (SWE-ABS)\n"
+                f"Coverage Verdict: {coverage_report.verdict.value}\n"
+                f"Exercised Symbols: {coverage_report.symbols_exercised}\n"
+                f"Vacuous Pass Detected: {coverage_report.is_vacuous_pass}\n"
+                f"Coverage Confidence: {coverage_report.confidence_score * 100:.1f}%\n\n"
+                "## Trajectory Rubric (SWE-TRACE PRM)\n"
+                f"Health: {trajectory_report.health.value}\n"
+                f"PRM Score: {trajectory_report.prm_score * 100:.1f}%\n"
+                f"Efficiency: {trajectory_report.efficiency_score * 100:.1f}%\n"
+                f"Scope Discipline: {trajectory_report.scope_discipline_score * 100:.1f}%\n"
+                f"Recommendation: {trajectory_report.recommendation}\n\n"
                 "## Test Flakiness & Quarantine\n"
                 f"Deterministic Suite Confidence: {quarantine_report.deterministic_suite_confidence * 100:.1f}%\n"
                 f"Quarantined Tests: {quarantine_report.quarantined_count}\n\n"
@@ -165,4 +195,6 @@ async def run(state: RepoMedicState) -> dict:
         "oracle_evaluation": oracle_eval.to_dict(),
         "consensus_audit": consensus_audit.to_dict(),
         "quarantine_report": quarantine_report.to_dict(),
+        "coverage_report": coverage_report.to_dict(),
+        "trajectory_rubric": trajectory_report.to_dict(),
     }
