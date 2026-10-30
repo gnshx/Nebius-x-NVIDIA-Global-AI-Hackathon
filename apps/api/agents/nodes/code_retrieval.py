@@ -18,6 +18,7 @@ from db.database import AsyncSessionLocal
 from models.orm import CodeChunk, Repository
 from models.enums import StepType
 from services.nebius.client import model_provider
+from services.context_slicer import ContextSlicer
 
 logger = structlog.get_logger(__name__)
 
@@ -141,23 +142,24 @@ async def run(state: RepoMedicState) -> dict:
                         "docstring": "",
                     })
 
-        # 4. Cap total word count to settings.max_context_tokens
-        capped_chunks: list[dict] = []
-        word_count = 0
-        for chunk in chunks:
-            content = chunk.get("content", "")
-            words = len(content.split())
-            if word_count + words > settings.max_context_tokens:
-                break
-            capped_chunks.append(chunk)
-            word_count += words
+        # 4. AST-aware semantic context slicing (CODESTRUCT 2026)
+        target_symbols = likely_components + [Path(rf).stem for rf in relevant_files]
+        sliced_result = ContextSlicer.slice_chunks(
+            chunks,
+            target_symbols=target_symbols,
+            max_tokens=settings.max_context_tokens,
+        )
 
     logger.info(
         "code_retrieval_complete",
         run_id=run_id,
         total_retrieved=len(chunks),
-        after_cap=len(capped_chunks),
-        approx_words=word_count,
+        after_slicing=len(sliced_result.sliced_chunks),
+        compression_ratio=sliced_result.compression_ratio,
+        density_score=sliced_result.context_density_score,
     )
 
-    return {"retrieved_context": capped_chunks}
+    return {
+        "retrieved_context": sliced_result.sliced_chunks,
+        "context_slicing": sliced_result.to_dict(),
+    }

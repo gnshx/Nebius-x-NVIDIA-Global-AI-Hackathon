@@ -25,6 +25,7 @@ from models.schemas import Patch, PatchReview
 from services.nebius.client import Message, model_provider
 from services.oracle_evaluator import OracleEvaluator
 from services.patch_minimizer import PatchMinimizer
+from services.consensus_auditor import PatchConsensusAuditor
 
 logger = structlog.get_logger(__name__)
 
@@ -80,6 +81,17 @@ async def run(state: RepoMedicState) -> dict:
         cleanliness_score=cleanliness,
     )
 
+    # Multi-dimensional consensus audit (TEX/PROBE 2026)
+    cross_val = state.get("cross_validation") or {}
+    test_qual = state.get("test_quality") or {}
+    consensus_audit = PatchConsensusAuditor.audit(
+        oracle_confidence=oracle_eval.confidence_score,
+        invariant_score=cross_val.get("invariant_score", 1.0),
+        cleanliness_score=cleanliness,
+        mutation_score=test_qual.get("discrimination_score", 1.0),
+        security_passed=True,
+    )
+
     messages = [
         Message(
             role="user",
@@ -105,6 +117,10 @@ async def run(state: RepoMedicState) -> dict:
                 f"Pass-to-Pass (P->P): {oracle_eval.pass_to_pass_passed}/{oracle_eval.pass_to_pass_total} maintained\n"
                 f"Cleanliness Score: {oracle_eval.cleanliness_score * 100:.1f}%\n"
                 f"Details: {oracle_eval.details}\n\n"
+                "## Deployment Readiness Index (DRI)\n"
+                f"DRI Score: {consensus_audit.dri_score}/100 ({consensus_audit.recommendation})\n"
+                f"Deployable: {consensus_audit.is_deployable}\n"
+                f"Breakdown: {consensus_audit.breakdown}\n\n"
                 "Review this patch. Flag any suspicious changes, incomplete fixes, "
                 "or tests that do not adequately cover the regression scenario. "
                 "Be strict: only approve if you are confident the issue is genuinely resolved."
@@ -137,4 +153,5 @@ async def run(state: RepoMedicState) -> dict:
     return {
         "patch_review": review.model_dump(),
         "oracle_evaluation": oracle_eval.to_dict(),
+        "consensus_audit": consensus_audit.to_dict(),
     }
